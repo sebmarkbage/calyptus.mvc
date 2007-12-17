@@ -78,12 +78,47 @@ public BlogController
 	}
 }
 
-public PostsController : IItemsContainer
+
+public WebShopControlller : IPagesContainer
 {
+	IQueryable<Page> Pages;
+}
+
+public PageController : IPagesContainer
+{
+	Page Parent;
+	Page Page;
+	IQueryable<Page> Pages;
+
+	public PagesController(IPagesContainer container, string pagefriendlyname)
+	{
+		if (container is PageController) Parent = (container as PageController).Page;
+		this.Page = container.Pages.Where(p => p.FriendlyName == pagefriendlyname);
+		this.Pages = this.Page.Children;
+	}
+
+	public void Edit()
+	{
+		
+	}
+}
+
+
+public PostsController : IPostsContainer
+{
+	public IQueryable<Items> Items;
 
 	public PostsController([Parent] IPostsContainer posts)
 	{
 		
+	}
+
+	public Expression<Action> ChangePartialDateAction(PartialDate date)
+	{
+		if ( tags != null )
+			return () => new PostsController(posts, date).List();
+		else
+			return () => new PostsController(posts, date, tags).List();
 	}
 
 	public PostsController([Parent] IPostsContainer posts, [Path] PartialDate date)
@@ -98,9 +133,15 @@ public PostsController : IItemsContainer
 
 	public void List()
 	{
-
+		RenderView("Views/Blogs/ListPosts", Items);
 	}
 }
+
+
+URL<PostsController>( c => c.List(new PartialDate(2007, 5, 5)) );
+
+URL( () => new PostsController(container, new PartialDate(2007, 5, 5)).List() );
+
 
 public class ItemFilters : IPathSerializable
 {

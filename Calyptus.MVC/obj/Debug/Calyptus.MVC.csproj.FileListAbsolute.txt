@@ -1,0 +1,5 @@
+D:\! Projects\MVC\Calyptus.MVC\bin\Debug\Calyptus.MVC.dll
+D:\! Projects\MVC\Calyptus.MVC\bin\Debug\Calyptus.MVC.pdb
+D:\! Projects\MVC\Calyptus.MVC\obj\Debug\ResolveAssemblyReference.cache
+D:\! Projects\MVC\Calyptus.MVC\obj\Debug\Calyptus.MVC.dll
+D:\! Projects\MVC\Calyptus.MVC\obj\Debug\Calyptus.MVC.pdb

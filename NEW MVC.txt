@@ -1,0 +1,202 @@
+public class CultureController
+{
+	[Action]
+	public RootController Index(CultureInfo culture)
+	{
+		System.Thread.Current.CultureUI = culture;		
+		return new RootController();
+	}
+
+	[Action]
+	public void Index()
+	{
+		RedirectToAction<CultureController>(c => c.Index(System.Thread.Current.CultureUI));
+	}
+}
+
+public class RootController
+{
+	DBContext db = new DBContext();
+	CultureInfo culture = System.Thread.Current.CultureUI;
+
+	[Action]
+	public RootController Index()
+	{
+		
+	}
+
+	[Action]
+	public void Index()
+	{
+		RenderView("Index");
+	}
+
+	public UserController User(string name)
+	{
+		return new UserController(db.Users.Where(u=>u.Name == name).First());
+	}
+
+	public BlogsController Blogs()
+	{
+		return new BlogsController(db.Blogs);
+	}
+}
+
+public class UserController
+{
+	User User;
+
+	public UserController User(User user)
+	{
+		this.User = user;
+	}
+
+	[Action]
+	public BlogsController Blogs()
+	{
+		return new BlogsController(User.Blogs);
+	}
+}
+
+
+public class BlogsController
+{
+	IQueryable<Blog> Blogs;
+
+	public BlogsController Blogs(IQueryable<Blog> blogs)
+	{
+		this.Blogs = blogs;
+	}
+
+	[Action]
+	public void Index()
+	{
+		RenderView("List", this.Blogs.Select(b=>b.Posts));
+	}
+	
+	[Action]
+	public BlogController Index(string blogName)
+	{
+		return new BlogController(blogs.Where(b => b.Name == blogName).First());
+	}
+}
+
+public class BlogController
+{
+	Blog Blog;
+
+	public BlogController(Blog blog)
+	{
+		
+	}
+
+	[Action]
+	public PostsController Index()
+	{
+		return new PostsController(this.Blog.Posts);
+	}
+}
+
+public class PostsController
+{
+	IQueryable<Post> Posts;
+	
+	public PostsController(IQueryable<Post> posts)
+	{
+		this.Posts = posts;
+	}
+	
+	[Action]
+	public void Index()
+	{
+		RenderView("Index", Posts);
+	}
+
+	[Action]
+	public PostsController Index(int year, int month, int date)
+	{
+		return new PostsController(this.Posts.Where(p=>p.Year == year && p.Month == month && p.Date == date));
+	}
+
+	[Action]
+	public PostController Index(string name)
+	{
+		return new PostController(this.Posts, name);
+	}
+
+	[Action("Tags")]
+	public PostsController FilterTags(string[] tags)
+	{
+		return new PostsController(this.Posts.Where(p=>p.Tags.Has(tags)));
+	}
+}
+
+public class PostController
+{
+	public PostController()
+	{
+	}
+
+	[Action]
+	public void Edit()
+	{
+		
+	}
+
+	[Action]
+	public ImagesController Images()
+	{
+		return new ImagesController(this.Posts.Images);
+	}
+}
+
+
+
+
+
+
+Link<RootController>(r => r.Culture("sv-SE").Blogs().Blog("Sebs_Blog").Posts(2007, 10, 10).Post("Seb").Edit());
+
+-> /sv-SE/Blogs/Sebs_Blog/2007/10/10/Seb/Edit
+
+
+
+Link<RootController>(0, r => r.Culture("en-US").Blogs().Blog("Sebs_Blog").Posts(2007, 10, 10).Post("Seb").Edit());
+LinkFirst<RootController>(r => r.Culture("en-US").Blogs().Blog("Sebs_Blog").Posts(2007, 10, 10).Post("Seb").Edit());
+
+-> /en-US/Blogs/Sebs_Blog/2007/10/10/Seb/Edit
+
+
+
+LinkLast<RootController>(r => r.Culture("sv-SE").Blogs().Blog("Sebs_Blog").Posts(2007, 10, 10).Post("Seb").Edit());
+
+-> /en-US/sv-SE/Blogs/Sebs_Blog/2007/10/10/Seb/Edit
+
+
+
+LinkReplace<RootController>(0, r => r.Culture("sv-SE"))
+LinkReplaceFirst<RootController>(r => r.Culture("sv-SE"))
+
+-> /sv-SE/Blogs/Sebs_Blog/2007/10/10/Seb/Edit
+
+
+
+LinkReplaceLast<RootController>(r => r.Culture("sv-SE"))
+
+-> /sv-SE/Blogs/Sebs_Blog/2007/10/10/Seb/Edit
+
+
+
+
+LinkFirst<RootController>(c => c.User("Seb"));
+
+LinkFirst<PostsController>(c=> c.Index(post.Date).Index(post.Name));
+
+
+root.User("Seb").Blogs("Sebs_Blog").Posts().Post("Sebs_Post").Blog().Posts().Post().
+
+
+/Views/User/Master.master
+/Views/User/Blogs/Blog/Posts/Post/Edit.aspx
+
+/Views/
