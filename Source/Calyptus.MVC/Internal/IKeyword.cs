@@ -9,7 +9,6 @@ namespace Calyptus.MVC.Internal
     internal interface IKeyword
     {
         string Keyword { get; }
-        RouteNode TargetNode { get; set; }
     }
 
     internal class PlainKeyword : IKeyword
@@ -28,8 +27,6 @@ namespace Calyptus.MVC.Internal
                 return keyword;
             }
         }
-
-        public RouteNode TargetNode { get; set; }
     }
 
     internal class ResourceKeyword : IKeyword
@@ -50,7 +47,5 @@ namespace Calyptus.MVC.Internal
                 return mgr.GetString(name);
             }
         }
-
-        public RouteNode TargetNode { get; set; }
     }
 }

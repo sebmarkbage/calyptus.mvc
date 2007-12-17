@@ -4,23 +4,50 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Linq.Expressions;
+using System.Web;
 
 namespace Calyptus.MVC.Internal
 {
     internal class RoutingEngine : IRoutingEngine
     {
+		private Dictionary<IKeyword, Type> _controllers;
+		//private Dictionary<Type, something> _controllerBindingCache;
+
         private RouteNode _root;
         public RouteNode Root { get { return _root; } }
+
+		public RoutingEngine() : this(GetAssemblies())
+		{
+		}
+
+		private static IEnumerable<Assembly> GetAssemblies()
+		{
+			foreach (Assembly a in System.Web.Compilation.BuildManager.GetReferencedAssemblies())
+				yield return a;
+		}
 
         public RoutingEngine(IEnumerable<Assembly> assemblies)
         {
             _root = new RouteNode();
         }
 
-        public void ParseRoute(PathStack path)
+		public IHttpHandler ParseRoute(PathStack path)
         {
-            throw new NotImplementedException();
+			if (path.Current == "MVC")
+				return new ControllerHandler { Stack = path, Engine = this };
+			return null;
         }
+
+		public bool TryParseSubRoute(PathStack path, object controller, out MethodInfo method, out object[] args)
+		{
+			if (path.Current == "MVC")
+			{
+				
+			}
+			method = null;
+			args = null;
+			return false;
+		}
 
         public string GetRelativePath(Expression<Action> action)
         {

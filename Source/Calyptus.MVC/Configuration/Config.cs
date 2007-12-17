@@ -7,13 +7,43 @@ namespace Calyptus.MVC.Configuration
 {
     public class Config : ConfigurationSection
     {
-        [ConfigurationProperty("assemblies")]
-        public AssemblyCollection Assemblies
-        {
-            get
-            {
-                return (AssemblyCollection)this["assemblies"];
-            }
-        }
+		[ConfigurationProperty("routingEngine", IsRequired = false)]
+		public string RoutingEngine
+		{
+			get
+			{
+				return (string)this["routingEngine"];
+			}
+			set
+			{
+				this["routingEngine"] = value;
+			}
+		}
+
+		[ConfigurationProperty("requireExplicitActions", IsRequired = false)]
+		public bool RequireExplicitActions
+		{
+			get
+			{
+				return (bool)this["requireExplicitActions"];
+			}
+			set
+			{
+				this["requireExplicitActions"] = value;
+			}
+		}
+
+		[ConfigurationProperty("defaultViewEngine", IsRequired = false)]
+		public string DefaultViewEngine
+		{
+			get
+			{
+				return (string)this["defaultViewEngine"];
+			}
+			set
+			{
+				this["defaultViewEngine"] = value;
+			}
+		}
     }
 }

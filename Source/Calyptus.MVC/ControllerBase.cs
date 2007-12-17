@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Calyptus.MVC
 {
-    public abstract class ControllerBase
+	public abstract class ControllerBase : IController
     {
         private IHttpContext _context;
         public IHttpContext Context { get { if (_context == null) _context = Controller.Context; return _context; } set { _context = value; } }

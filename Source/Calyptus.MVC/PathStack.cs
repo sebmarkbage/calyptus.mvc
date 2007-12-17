@@ -81,7 +81,7 @@ namespace Calyptus.MVC
         public void AddToPath(string path)
         {
             if (_readOnly)
-                throw new Exception("This PathStack is read only.");
+                throw new InvalidOperationException("This PathStack is read only.");
             string[] n = new string[_path.Length + 1];
             Array.Copy(_path, n, _path.Length);
             _path = n;
