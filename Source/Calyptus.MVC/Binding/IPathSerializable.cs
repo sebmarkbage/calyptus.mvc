@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Calyptus.MVC.Binding
 {
-    interface IPathSerializable<T>
+    interface IPathSerializable
     {
-        //static bool TryDeserializePath(PathStack stack, out T obj);
-        void SerializeToPath(PathStack stack);
+        //static bool TryDeserializePath(PathStack stack, out object obj);
+        void SerializeToPath(IPathStack stack);
     }
 }

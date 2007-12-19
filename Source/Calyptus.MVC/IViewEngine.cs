@@ -7,8 +7,9 @@ namespace Calyptus.MVC
 {
     public interface IViewEngine
     {
-        void RenderView(IHttpContext context, string view);
-        void RenderView(IHttpContext context, string view, object data);
-        void RenderView(IHttpContext context, string view, object[] data);
-    }
+        void RenderView(IHttpContext context, IRoutingEngine routing, string view);
+		void RenderView(IHttpContext context, IRoutingEngine routing, string view, object data);
+		void RenderView(IHttpContext context, IRoutingEngine routing, string view, string master);
+		void RenderView(IHttpContext context, IRoutingEngine routing, string view, string master, object data);
+	}
 }

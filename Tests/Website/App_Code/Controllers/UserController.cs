@@ -7,17 +7,30 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
+using Calyptus.MVC.Binding;
+using Calyptus.MVC;
 
-public class UserController
+[Controller(RequireExplicitActionAttributes=false)]
+public class UserController : Controller
 {
     public UserController()
     {
 
     }
 
-    public BlogsController Blogs()
-    {
-        return new BlogsController();
-    }
+	[DefaultAction]
+	public void Index()
+	{
+		RenderView("Default", 3);
+	}
+
+	public void More()
+	{
+		RenderView("Default", 4);
+	}
+
+	//public BlogsController Blogs()
+	//{
+	//    return new BlogsController();
+	//}
 }

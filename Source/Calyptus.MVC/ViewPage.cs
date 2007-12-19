@@ -20,8 +20,6 @@ namespace Calyptus.MVC
             }
             set
             {
-                object[] args = value is object[] ? (object[])value : new object[] { value };
-                this.GetType().InvokeMember("InitViewData", BindingFlags.NonPublic | BindingFlags.InvokeMethod, null, this, args);
                 _viewData = value;
             }
         }

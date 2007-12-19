@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Reflection;
-using Calyptus.MVC.Internal;
 using Calyptus.MVC.Configuration;
 using System.Web.Configuration;
 using System.Configuration;
@@ -14,9 +13,9 @@ namespace Calyptus.MVC
 {
     public class RoutingModule : IHttpModule
     {
-        private static IRoutingEngine _engine;
-		private static object _routingEngineLock = new object();
 		private static object _requestDataKey = new object();
+		//private static string[] _defaultDocuments = new string[] { "/Default.aspx" };
+		private static string defaultDocument = "/Default.aspx";
 
         public void Init(HttpApplication app)
         {
@@ -29,51 +28,26 @@ namespace Calyptus.MVC
             HttpContext context = ((HttpApplication)s).Context;
             HttpRequest request = context.Request;
 
-            if (_engine == null)
-            {
-				lock (_routingEngineLock)
+			string appRelPath = request.AppRelativeCurrentExecutionFilePath;
+
+			int l = appRelPath.Length - 2;
+			//foreach(string defaultDocument in _defaultDocuments)
+				if (appRelPath.EndsWith(defaultDocument, StringComparison.InvariantCultureIgnoreCase))
 				{
-					Config config = (Config)ConfigurationManager.GetSection("calyptus.mvc");
-					if (string.IsNullOrEmpty(config.RoutingEngine))
-						_engine = new RoutingEngine();
-					else
-					{
-						Type t = Type.GetType(config.RoutingEngine);
-						if (t == null)
-							throw new ConfigurationErrorsException(String.Format("Routing engine \"{0}\" could not be found.", config.RoutingEngine));
-						if (!typeof(IRoutingEngine).IsAssignableFrom(t))
-							throw new ConfigurationErrorsException(String.Format("Routing engine \"{0}\" is not an IRoutingEngine.", config.RoutingEngine));
-						_engine = (IRoutingEngine)Activator.CreateInstance(t);
-					}
+					l -= defaultDocument.Length;
+					//break;
 				}
-            }
 
-			string[] path = (request.AppRelativeCurrentExecutionFilePath.Substring(2) + request.PathInfo).Split('/');
+			string[] path = ((l <= 0 ? null : request.AppRelativeCurrentExecutionFilePath.Substring(2, l)) + request.PathInfo).Split('/');
 
-            if (path != null)
-                for (int i = 0; i < path.Length; i++)
-                    path[i] = HttpUtility.UrlDecode(path[i]);
+            IPathStack stack = new PathStack(path, context.Request.QueryString, true);
 
-            PathStack stack = new PathStack(path, true);
-
-			IHttpHandler handler = _engine.ParseRoute(stack);
+			IHttpHandler handler = Config.GetRoutingEngine().ParseRoute(new VirtualHttpContext(context), stack);
 			if (handler != null)
 			{
 				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path };
 				context.RewritePath("~/Calyptus.MVC.axd");
 			}
-
-            //Assembly ass = (Assembly)System.Web.Compilation.BuildManager.CodeAssemblies[0];
-            //Type t = ass.GetType("PageController");
-            
-            //object controller = System.Activator.CreateInstance(t, "test");
-
-            //MemberInfo m = t.GetMember(".ctor", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)[0];
-            //t.InvokeMember(".ctor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, null, new object[] {"name"});
-
-            /*IHttpHandler handler = new ControllerHandler();
-            context.Handler = handler;*/
-
         }
 
 		void Reset(object s, EventArgs e)

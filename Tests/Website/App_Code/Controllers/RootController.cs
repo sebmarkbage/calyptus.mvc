@@ -11,40 +11,24 @@ using Calyptus.MVC;
 using Calyptus.MVC.Binding;
 using System.Globalization;
 using System.Linq;
+using Calyptus.MVC.Extensions;
 
-[Controller("keyword")]
-public class RootController : ControllerBase, IPagesHolder
+[DefaultController]
+public class RootController : Controller
 {
-    public IPagesHolder Parent { get; set; }
+	//   [Get] [Post] [Cookie] [Session] [SOAP] [JSON]
 
-    public RootController()
-    {
-    }
+	[Action("Pages")]
+	public PageController Pages()
+	{
+		return new PageController();
+	}
 
-    public RootController(CultureInfo culture)
+    [DefaultAction]
+	[Action]
+	[Cache(Cacheability=HttpCacheability.Server, Expires=3)]
+    public void Index([Path]string id, [Get]string pageName)
     {
-    }
-
-    public RootController(CultureInfo culture, string somestring)
-    {
-        
-    }
-
-    [Action]
-    public void Index()
-    {
-        RenderView("Default");
-    }
-
-    public IQueryable<Page> Children
-    {
-        get
-        {
-            return db.Pages.Where(p => p.Parent == null);
-        }
-        set
-        {
-            throw new NotImplementedException();
-        }
+		RenderView("Default", new { ID = id, Name = pageName });
     }
 }

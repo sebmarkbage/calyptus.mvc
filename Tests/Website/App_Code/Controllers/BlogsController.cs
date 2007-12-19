@@ -8,62 +8,61 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 
-public class BlogsController
-{
-    IQueryable<Blog> Blogs;
+//public class BlogsController
+//{
+//    IQueryable<Blog> Blogs;
 
-    public BlogsController()
-    {
+//    public BlogsController()
+//    {
 
-    }
+//    }
 
-    public PostsController Index()
-    {
-        return new PostsController();
-    }
-}
+//    public PostsController Index()
+//    {
+//        return new PostsController();
+//    }
+//}
 
-public class PostsController
-{
-    IQueryable<Post> Posts;
+//public class PostsController
+//{
+//    IQueryable<Post> Posts;
 
-    public PostsController()
-    {
-    }
+//    public PostsController()
+//    {
+//    }
 
-    public void List(int year, int month, int date, string[] tags)
-    {
-        RenderView("List", Posts);
-    }
+//    public void List(int year, int month, int date, string[] tags)
+//    {
+//        RenderView("List", Posts);
+//    }
 
-    public void View(int year, int month, int date, string name)
-    {
-        RenderView("View", Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First());
-    }
+//    public void View(int year, int month, int date, string name)
+//    {
+//        RenderView("View", Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First());
+//    }
 
-    public CommentsController View(int year, int month, int date, string name)
-    {
-        return new CommentsController(Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First().Comments);
-    }
+//    /*public CommentsController View(int year, int month, int date, string name)
+//    {
+//        return new CommentsController(Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First().Comments);
+//    }*/
 
-    public void Edit(int year, int month, int date, string name)
-    {
-        RenderView("Edit", Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First());
-    }
-}
+//    public void Edit(int year, int month, int date, string name)
+//    {
+//        RenderView("Edit", Posts.Where(p => p.Year == year && p.Month == month && p.Date == date && p.Title == name).First());
+//    }
+//}
 
-public class CommentsController
-{
-    public CommentsController()
-    {
-    }
+//public class CommentsController
+//{
+//    public CommentsController()
+//    {
+//    }
 
-    public void Edit()
-    {
-    }
-}
+//    public void Edit()
+//    {
+//    }
+//}
 /*
 /User/Profile.aspx
 /User/EditProfile.aspx

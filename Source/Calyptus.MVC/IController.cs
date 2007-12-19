@@ -7,5 +7,10 @@ namespace Calyptus.MVC
 {
 	interface IController
 	{
+		IHttpContext Context { get; set; }
+
+		IRoutingEngine Routing { get; set; }
+
+		IViewEngine ViewEngine { get; set; }
 	}
 }

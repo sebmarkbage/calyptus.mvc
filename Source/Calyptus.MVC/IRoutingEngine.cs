@@ -9,7 +9,8 @@ namespace Calyptus.MVC
 {
     public interface IRoutingEngine
     {
-        bool TryParseRoute(PathStack path, out IHttpHandler handler);
+		IHttpHandler ParseRoute(IHttpContext context, IPathStack path);
+
         string GetRelativePath(Expression<Action> action);
         string GetURL(Expression<Action> action);
         string GetAbsolutePath(Expression<Action> action);
