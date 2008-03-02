@@ -11,7 +11,6 @@ using Calyptus.MVC.Binding;
 using System.Linq;
 using Calyptus.MVC;
 
-[ChildController]
 public class PageController : Controller
 {
     [DefaultAction]

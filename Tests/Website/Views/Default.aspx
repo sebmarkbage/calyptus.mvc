@@ -9,9 +9,9 @@
     <title></title>
 </head>
 <body>
-	<h2><%= ViewData %></h2>
+	<h2></h2>
 	<p><%= ID %></p>
-	<h4><%= DateTime.Now %></h4>
+	<h4><%= ViewData %></h4>
 	<%--
     <div>
         <% foreach(Page p in Controller.Page.Children) { %>

@@ -10,23 +10,39 @@ using System.Web.UI.WebControls.WebParts;
 using Calyptus.MVC.Binding;
 using Calyptus.MVC;
 
-[Controller(RequireExplicitActionAttributes=false)]
+[ControllerOption]
 public class UserController : Controller
 {
-    public UserController()
-    {
+	public User User { get; set; }
+	public IMaster Master { get; set; }
 
+    public UserController(User user, IMaster master)
+    {
+		this.User = user;
+		this.Master = master;
     }
 
-	[DefaultAction]
-	public void Index()
+	[Action(View="Default", ViewEngine="WebFormsViewEngine")]
+	[Action(ContentType="application/json", ViewEngine="JSONSerializer")]
+	public IView Index()
 	{
-		RenderView("Default", 3);
+		RenderView("Default", User);
+		return User;
+		return View("Default", Master, User);
+		//RenderView("Default", (object) "UserController.Index");
 	}
 
+	[Action("More")]
 	public void More()
 	{
-		RenderView("Default", 4);
+		//RenderView("Default", (object)"UserController.More");
+
+	}
+
+	[DeleteAction]
+	public void Delete()
+	{
+
 	}
 
 	//public BlogsController Blogs()
