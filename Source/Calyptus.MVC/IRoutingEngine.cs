@@ -11,8 +11,10 @@ namespace Calyptus.MVC
     {
 		IHttpHandler ParseRoute(IHttpContext context, IPathStack path);
 
-        string GetRelativePath(Expression<Action> action);
-        string GetURL(Expression<Action> action);
-        string GetAbsolutePath(Expression<Action> action);
-    }
+        string GetRelativePath<T>(Expression<Action<T>> action);
+		string GetRelativePath<T>(int index, Expression<Action<T>> action);
+		string GetReplacementPath<T>(Expression<Action<T>> action);
+		string GetReplacementPath<T>(int index, Expression<Action<T>> action);
+		string GetAbsolutePath<T>(Expression<Action<T>> action);
+	}
 }

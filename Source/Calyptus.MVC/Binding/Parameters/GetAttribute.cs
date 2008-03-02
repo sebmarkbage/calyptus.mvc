@@ -18,4 +18,7 @@ namespace Calyptus.MVC.Binding
 			SerializeBinding(path.QueryString, obj);
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
+	public class QueryAttribute : GetAttribute { }
 }

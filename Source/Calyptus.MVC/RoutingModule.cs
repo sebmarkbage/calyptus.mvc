@@ -20,7 +20,6 @@ namespace Calyptus.MVC
         public void Init(HttpApplication app)
         {
 			app.PostResolveRequestCache += new EventHandler(Route);
-			app.PostMapRequestHandler += new EventHandler(Reset);
         }
 
         void Route(object s, EventArgs e)
@@ -38,7 +37,7 @@ namespace Calyptus.MVC
 					//break;
 				}
 
-			string[] path = ((l <= 0 ? null : request.AppRelativeCurrentExecutionFilePath.Substring(2, l)) + request.PathInfo).Split('/');
+			string path = ((l <= 0 ? null : request.AppRelativeCurrentExecutionFilePath.Substring(2, l)) + request.PathInfo);
 
             IPathStack stack = new PathStack(path, context.Request.QueryString, true);
 
@@ -50,21 +49,22 @@ namespace Calyptus.MVC
 			}
         }
 
-		void Reset(object s, EventArgs e)
+        public void Dispose()
+        {
+        }
+
+		internal static IHttpHandler GetHandler(HttpContext context)
 		{
-            HttpContext context = ((HttpApplication)s).Context;
 			RequestData data = (RequestData) context.Items[_requestDataKey];
 			if (data != null)
 			{
 				context.Items.Remove(_requestDataKey);
 				context.RewritePath(data.OriginalPath);
-				context.Handler = data.Handler;
+				return data.Handler;
 			}
+			else
+				return null;
 		}
-
-        public void Dispose()
-        {
-        }
 
 		private class RequestData
 		{

@@ -7,7 +7,7 @@ using System.Reflection;
 namespace Calyptus.MVC.Binding
 {
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple=true, Inherited=false)]
-    public class PathAttribute : Attribute, IBindable
+    public class PathAttribute : Attribute, IParameterBinding
     {
 		private static IDictionary<Type, MethodInfo> _deserializeMethodCache;
 
@@ -15,38 +15,22 @@ namespace Calyptus.MVC.Binding
 
 		public string NullValue { get; set; }
 
-		internal IKeyword Keyword { get; set; }
-
 		public PathAttribute()
 		{
-			this.Keyword = new DefaultKeyword();
 		}
-		protected PathAttribute(IKeyword keyword)
-		{
-			this.Keyword = keyword;
-		}
-		public PathAttribute(string keyword)
-        {
-            this.Keyword = new PlainKeyword(keyword);
-        }
-		public PathAttribute(string keywordResourceBaseName, string keywordResourceName)
-        {
-            this.Keyword = new ResourceKeyword(System.Reflection.Assembly.GetExecutingAssembly(), keywordResourceBaseName, keywordResourceName);
-        }
-		public PathAttribute(string keywordResourceAssembly, string keywordResourceBaseName, string keywordResourceName)
-        {
-            this.Keyword = new ResourceKeyword(System.Reflection.Assembly.Load(keywordResourceAssembly), keywordResourceBaseName, keywordResourceName);
-        }
 
-		public virtual void Initialize(Type type, string name)
+		public virtual void Initialize(ParameterInfo parameter)
 		{
-			if (Keyword == null) Keyword = new PlainKeyword(name);
-			_type = type;
+			if (Keyword == null) Keyword = new PlainPath(parameter.Name);
+
+			Keyword.Initialize(parameter.Member);
+
+			_type = parameter.ParameterType;
 		}
 
 		private Type _type;
 
-		bool IBindable.TryBinding(IHttpContext context, IPathStack path, out object obj)
+		bool IParameterBinding.TryBinding(IHttpContext context, IPathStack path, out object obj)
 		{
 			if (Keyword.Try(path))
 			{
@@ -59,14 +43,18 @@ namespace Calyptus.MVC.Binding
 			}
 		}
 
-		void IBindable.SerializePath(IPathStack path, object obj)
+		void IParameterBinding.SerializePath(IPathStack path, object obj)
 		{
-			Keyword.Serialize(path);
 		}
 
 		public virtual bool TryBinding(IPathStack path, Type type, out object obj)
 		{
-			if (NullValue != null && NullValue.Equals(path.Peek(), StringComparison.CurrentCultureIgnoreCase))
+			if (path.IsAtEnd)
+			{
+				obj = null;
+				return false;
+			}
+			else if (NullValue != null && NullValue.Equals(path.Peek(), StringComparison.CurrentCultureIgnoreCase))
 			{
 				path.Pop();
 				obj = !type.IsClass ? Activator.CreateInstance(type) : null;
@@ -97,7 +85,7 @@ namespace Calyptus.MVC.Binding
 			{
 				try
 				{
-					obj = Convert.ChangeType(path.Peek(), type);
+					obj = Convert.ChangeType(path.Peek(), type, System.Globalization.CultureInfo.InvariantCulture);
 					path.Pop();
 					return true;
 				}
@@ -112,11 +100,9 @@ namespace Calyptus.MVC.Binding
 		public virtual void SerializeBinding(IPathStack path, object obj)
 		{
 			if (obj is IPathSerializable)
-			{
 				((IPathSerializable) obj).SerializeToPath(path);
-			}
 			else
-				path.Push(obj.ToString());
+				path.Push(Convert.ToString(obj, System.Globalization.CultureInfo.InvariantCulture));
 		}
 	}
 }

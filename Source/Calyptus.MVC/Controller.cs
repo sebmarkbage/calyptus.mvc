@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using System.Web;
+using Calyptus.MVC.Binding;
 
 namespace Calyptus.MVC
 {
-	public abstract class Controller : IController
+	public abstract class Controller
     {
 		private IHttpContext _context;
+		[ContextBinding]
 		public IHttpContext Context { get { return _context; } set { _context = value; } }
 
         private IRoutingEngine _routing;
@@ -18,15 +20,55 @@ namespace Calyptus.MVC
         private IViewEngine _viewengine;
         public IViewEngine ViewEngine { get { return _viewengine; } set { if (value == null) throw new NullReferenceException("The controller view engine cannot be null."); _viewengine = value; } }
 
-        protected virtual void RedirectToAction(Expression<Action> action)
+		protected virtual void Redirect<T>(Expression<Action<T>> action)
+		{
+			Context.Response.Redirect(URL<T>(action));
+		}
+
+		protected virtual void Redirect<T>(int index, Expression<Action<T>> action)
+		{
+			Context.Response.Redirect(URL<T>(index, action));
+		}
+
+		protected virtual void RedirectReplace<T>(Expression<Action<T>> action)
+		{
+			Context.Response.Redirect(URLReplace<T>(action));
+		}
+
+		protected virtual void RedirectReplace<T>(int index, Expression<Action<T>> action)
+		{
+			Context.Response.Redirect(URLReplace<T>(index, action));
+		}
+
+		protected virtual void RedirectAbsolute<T>(Expression<Action<T>> action)
+		{
+			Context.Response.Redirect(URLAbsolute<T>(action));
+		}
+
+		protected virtual string URL<T>(Expression<Action<T>> action)
         {
-            Context.Response.Redirect(Routing.GetRelativePath(action));
+            return Routing.GetRelativePath<T>(action);
         }
 
-		protected virtual string URL(Expression<Action> action)
+		protected virtual string URL<T>(int index, Expression<Action<T>> action)
         {
-            return Routing.GetRelativePath(action);
+            return Routing.GetRelativePath<T>(index, action);
         }
+
+		protected virtual string URLReplace<T>(Expression<Action<T>> action)
+		{
+			return Routing.GetReplacementPath<T>(action);
+		}
+
+		protected virtual string URLReplace<T>(int index, Expression<Action<T>> action)
+        {
+            return Routing.GetReplacementPath<T>(index, action);
+        }
+
+		protected virtual string URLAbsolute<T>(Expression<Action<T>> action)
+		{
+			return Routing.GetAbsolutePath<T>(action);
+		}
 
 		protected virtual void RenderView(string view)
         {

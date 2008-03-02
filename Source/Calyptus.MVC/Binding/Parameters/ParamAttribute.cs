@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 namespace Calyptus.MVC.Binding
 {
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple=true, Inherited=false)]
-	public class ParamAttribute : Attribute, IBindable
+	public class ParamAttribute : Attribute, IParameterBinding
 	{
 		public string ValidationRegEx { get; set; }
 
@@ -16,10 +16,10 @@ namespace Calyptus.MVC.Binding
 		{
 		}
 
-		public void Initialize(Type type, string name)
+		public void Initialize(ParameterInfo parameter)
 		{
-			_type = type;
-			_name = name;
+			_type = parameter.ParameterType;
+			_name = parameter.Name;
 		}
 
 		private Type _type;
@@ -45,7 +45,7 @@ namespace Calyptus.MVC.Binding
 				{
 				}
 			obj = !_type.IsClass ? Activator.CreateInstance(_type) : null;
-			return !Required;
+			return false;
 		}
 
 		public virtual void SerializePath(IPathStack path, object obj)

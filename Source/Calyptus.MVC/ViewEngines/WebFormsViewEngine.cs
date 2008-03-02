@@ -10,7 +10,7 @@ namespace Calyptus.MVC.ViewEngines
 {
     public class WebFormsViewEngine : IViewEngine
     {
-		private static string[] _masterPatterns = new string[] { "~/Views/{1}/{0}.master", "~/Views/Shared/{0}.master" };
+		private static string[] _masterPatterns = new string[] { "~/Masters/{1}/{0}.master", "~/Masters/Shared/{0}.master" };
 		private static string[] _viewPatterns = new string[] { "~/Views/{1}/{0}.aspx", "~/Views/{1}/{0}.ascx", "~/Views/Shared/{0}.aspx", "~/Views/Shared/{0}.ascx" };
 
 		public void RenderView(IHttpContext context, IRoutingEngine routing, string view)

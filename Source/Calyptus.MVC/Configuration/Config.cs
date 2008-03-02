@@ -21,12 +21,12 @@ namespace Calyptus.MVC.Configuration
 			Current = (Config) ConfigurationManager.GetSection("calyptus.mvc");
 		}
 
-		[ConfigurationProperty("keywordExtension", IsRequired = false)]
-		public string KeywordExtension
+		[ConfigurationProperty("extension", IsRequired = false)]
+		public string Extension
 		{
 			get
 			{
-				var r = (string)this["keywordExtension"];
+				var r = (string)this["extension"];
 				if (r == "")
 					return null;
 				else
@@ -34,7 +34,7 @@ namespace Calyptus.MVC.Configuration
 			}
 			set
 			{
-				this["keywordExtension"] = value;
+				this["extension"] = value;
 			}
 		}
 
@@ -72,11 +72,11 @@ namespace Calyptus.MVC.Configuration
 			}
 		}
 
-		public static string GetKeywordExtension()
+		public static string GetExtension()
 		{
 			if (!Current._useExtensionSet)
 			{
-				Current._useExtension = Current.KeywordExtension;
+				Current._useExtension = Current.Extension;
 				Current._useExtensionSet = true;
 			}
 			return Current._useExtension;
@@ -90,7 +90,7 @@ namespace Calyptus.MVC.Configuration
 				{
 					string value = Current.RoutingEngine;
 					if (value == null)
-						Current._routingEngine = new RoutingEngine();
+						Current._routingEngine = new AttributeRoutingEngine();
 					else
 					{
 						Type t = Type.GetType(value);

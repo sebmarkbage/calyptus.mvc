@@ -7,7 +7,7 @@ namespace Calyptus.MVC.Binding
 {
     interface IPathSerializable
     {
-        //static bool TryDeserializePath(PathStack stack, out object obj);
+        //static bool TryDeserializePath(IPathStack stack, out object obj);
         void SerializeToPath(IPathStack stack);
     }
 }

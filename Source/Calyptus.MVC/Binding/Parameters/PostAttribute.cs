@@ -18,4 +18,7 @@ namespace Calyptus.MVC.Binding
 			// Exclude
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
+	public class FormAttribute : PostAttribute { }
 }

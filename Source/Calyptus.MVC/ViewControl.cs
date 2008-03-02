@@ -12,9 +12,29 @@ namespace Calyptus.MVC
 
         public IRoutingEngine Routing { get; set; }
 
-        public string URL(Expression<Action> action)
-        {
-            return Routing.GetRelativePath(action);
-        }
+		protected virtual string URL<T>(Expression<Action<T>> action)
+		{
+			return Routing.GetRelativePath<T>(action);
+		}
+
+		protected virtual string URL<T>(int index, Expression<Action<T>> action)
+		{
+			return Routing.GetRelativePath<T>(index, action);
+		}
+
+		protected virtual string URLReplace<T>(Expression<Action<T>> action)
+		{
+			return Routing.GetReplacementPath<T>(action);
+		}
+
+		protected virtual string URLReplace<T>(int index, Expression<Action<T>> action)
+		{
+			return Routing.GetReplacementPath<T>(index, action);
+		}
+
+		protected virtual string URLAbsolute<T>(Expression<Action<T>> action)
+		{
+			return Routing.GetAbsolutePath<T>(action);
+		}
     }
 }

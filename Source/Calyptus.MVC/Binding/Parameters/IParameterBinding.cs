@@ -6,10 +6,10 @@ using System.Reflection;
 
 namespace Calyptus.MVC.Binding
 {
-	public interface IBindable
+	public interface IParameterBinding
 	{
-		void Initialize(Type type, string name);
-		bool TryBinding(IHttpContext context, IPathStack path, out object obj);
+		void Initialize(ParameterInfo parameter);
+		bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight);
 		void SerializePath(IPathStack path, object obj);
 	}
 }
