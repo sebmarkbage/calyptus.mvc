@@ -5,15 +5,16 @@ using System.Text;
 using System.Reflection;
 using System.Web;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
 	interface IActionBinding
 	{
 		void Initialize(MethodInfo method);
 		bool TryBinding(IHttpContext context, IPathStack path, out object[] parameters, out int overloadWeight);
-		void OnPreAction(IHttpContext context, object[] parameters);
-		void OnPostAction(IHttpContext context, object returnValue);
 		void SerializePath(IPathStack stack, object[] parameters);
-		int MappingWeight { get; }
+		void OnBeforeAction(IHttpContext context, object[] parameters);
+		bool OnError(IHttpContext context, Exception error);
+		void OnAfterAction(IHttpContext context, object returnValue);
+		void OnRender(IHttpContext context, object value);
 	}
 }

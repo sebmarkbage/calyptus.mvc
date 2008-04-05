@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Calyptus.MVC.RoutingEngines;
 using System.Web;
 using System.Web.SessionState;
 using System.ComponentModel;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
     public abstract class ActionBaseAttribute : Attribute, IActionBinding
     {
@@ -17,11 +16,15 @@ namespace Calyptus.MVC.Binding
 		protected IParameterBinding[][] Bindings;
 		protected IExtension[] Extensions;
 
+		// AsyncEndDelegate
+		// OnBeforeActionDelegate
+		// OnAfterActionDelegate
+
 		protected Type DefaultParameterBinderType = typeof(ParamAttribute);
 
 		public virtual string View { get; set; }
 		public virtual string Master { get; set; }
-		public virtual IViewEngine ViewEngine { get; set; }
+		public virtual IViewFactory ViewEngine { get; set; }
 
 		public ActionBaseAttribute() : this(null) { }
 
@@ -59,7 +62,10 @@ namespace Calyptus.MVC.Binding
 				}
 				else
 				{
-					IParameterBinding b = (IParameterBinding)Activator.CreateInstance(DefaultParameterBinderType);
+					IParameterBinding b = 
+						ContextAttribute.IsContextType(p.ParameterType) ?
+						new ContextAttribute() :
+						(IParameterBinding)Activator.CreateInstance(DefaultParameterBinderType);
 					b.Initialize(p);
 					bindings = new IParameterBinding[] { b };
 				}
@@ -83,11 +89,16 @@ namespace Calyptus.MVC.Binding
 		{
 			foreach (IMappingBinding mapping in this.Mappings)
 				if (!mapping.TryMapping(context, path))
+				{
+					arguments = null;
+					overloadWeight = 0;
 					return false;
+				}
 
-			foreach (IExtension extension in this.Extensions)
-				if (!extension.TryMapping(context, path))
-					return false;
+			// Allow IExtension to affect mapping?
+			//foreach (IExtension extension in this.Extensions)
+			//    if (!extension.TryMapping(context, path))
+			//        return false;
 
 			if (!path.IsAtEnd)
 			{
@@ -105,7 +116,7 @@ namespace Calyptus.MVC.Binding
 
 			int l = Bindings.Length;
 			arguments = new object[Bindings.Length];
-			overloadWeight = 0;
+			overloadWeight = Mappings.Count;
 			for (int i = 0; i < l; i++)
 			{
 				bool bound = false;
@@ -141,16 +152,51 @@ namespace Calyptus.MVC.Binding
 			int l = Bindings.Length;
 
 			if (arguments.Length != l)
-				throw new Exception("Wrong number of arguments.");
+				throw new BindingException("Wrong number of arguments.");
 
 			for (int i = 0; i < l; i++)
 			{
-				IParameterBinding b = Bindings[i][0];
-				b.SerializePath(path, arguments[i]);
+				IParameterBinding[] b = Bindings[i];
+				for (int ii = 0; ii < b.Length; ii++)
+				{
+					IParameterBinding bb = b[ii];
+					int index = path.Index;
+					bb.SerializePath(path, arguments[i]);
+					if (path.Index > index)
+						break;
+				}
 			}
 		}
 
+		public void OnBeforeAction(IHttpContext context, object[] parameters)
+		{
+			// Raise OnBeforeActionDelegate
+		}
 
+		public void OnAfterAction(IHttpContext context, object returnValue)
+		{
+			// Raise OnAfterActionDelegate
+		}
 
+		public void OnRender(IHttpContext context, object value)
+		{
+			IViewTemplate template = value as IViewTemplate;
+			if (template != null)
+			{
+				// Find View
+			}
+			IRenderable renderable = value as IRenderable;
+			if (renderable != null)
+			{
+				renderable.Render(context);
+				return;
+			}
+			// Use serializer
+		}
+
+		public bool OnError(IHttpContext context, Exception error)
+		{
+			return true;
+		}
 	}
 }

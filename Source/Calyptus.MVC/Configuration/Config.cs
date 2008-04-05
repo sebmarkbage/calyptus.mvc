@@ -2,8 +2,6 @@
 using System.Configuration;
 using System.Xml;
 using System.Web.Configuration;
-using Calyptus.MVC.ViewEngines;
-using Calyptus.MVC.RoutingEngines;
 
 namespace Calyptus.MVC.Configuration
 {
@@ -12,7 +10,7 @@ namespace Calyptus.MVC.Configuration
 		public static Config Current { get; private set; }
 		
 		private IRoutingEngine _routingEngine;
-		private IViewEngine _defaultViewEngine;
+		private IViewFactory _viewFactory;
 		private string _useExtension;
 		private bool _useExtensionSet;
 
@@ -55,12 +53,12 @@ namespace Calyptus.MVC.Configuration
 			}
 		}
 
-		[ConfigurationProperty("defaultViewEngine", IsRequired = false)]
-		public string DefaultViewEngine
+		[ConfigurationProperty("viewFactory", IsRequired = false)]
+		public string ViewFactory
 		{
 			get
 			{
-				var r = (string)this["defaultViewEngine"];
+				var r = (string)this["viewFactory"];
 				if (r == "")
 					return null;
 				else
@@ -68,7 +66,7 @@ namespace Calyptus.MVC.Configuration
 			}
 			set
 			{
-				this["defaultViewEngine"] = value;
+				this["viewFactory"] = value;
 			}
 		}
 
@@ -105,27 +103,27 @@ namespace Calyptus.MVC.Configuration
 			return Current._routingEngine;
 		}
 
-		public static IViewEngine GetDefaultViewEngine()
+		public static IViewFactory GetViewFactory()
 		{
-			if (Current._defaultViewEngine == null)
+			if (Current._viewFactory == null)
 			{
 				lock (Current)
 				{
-					string value = Current.DefaultViewEngine;
+					string value = Current.ViewFactory;
 					if (value == null)
-						Current._defaultViewEngine = new WebFormsViewEngine();
+						Current._viewFactory = new WebFormsViewFactory();
 					else
 					{
 						Type t = Type.GetType(value);
 						if (t == null)
 							throw new ConfigurationErrorsException(String.Format("View engine \"{0}\" could not be found.", value));
-						if (!typeof(IViewEngine).IsAssignableFrom(t))
+						if (!typeof(IViewFactory).IsAssignableFrom(t))
 							throw new ConfigurationErrorsException(String.Format("View engine \"{0}\" is not an IViewEngine.", value));
-						Current._defaultViewEngine = (IViewEngine)Activator.CreateInstance(t);
+						Current._viewFactory = (IViewFactory)Activator.CreateInstance(t);
 					}
 				}
 			}
-			return Current._defaultViewEngine;
+			return Current._viewFactory;
 		}
     }
 }

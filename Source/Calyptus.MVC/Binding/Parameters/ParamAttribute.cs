@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Specialized;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple=true, Inherited=false)]
 	public class ParamAttribute : Attribute, IParameterBinding
@@ -27,8 +27,9 @@ namespace Calyptus.MVC.Binding
 
 		public bool Required { get; set; }
 
-		public virtual bool TryBinding(IHttpContext context, IPathStack path, out object obj)
+		public virtual bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
 		{
+			overloadWeight = 9;
 			return TryBinding(context.Request.Params, out obj);
 		}
 

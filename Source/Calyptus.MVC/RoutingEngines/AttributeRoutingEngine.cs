@@ -5,14 +5,14 @@ using System.Text;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Web;
-using Calyptus.MVC.Binding;
+using Calyptus.MVC;
 using System.Collections;
 
-namespace Calyptus.MVC.RoutingEngines
+namespace Calyptus.MVC
 {
     internal class AttributeRoutingEngine : IRoutingEngine
     {
-		private IControllerBinding[] _controllers;
+		private IEntryControllerBinding[] _controllers;
 
 		public AttributeRoutingEngine() : this(System.Web.Compilation.BuildManager.GetReferencedAssemblies())
 		{
@@ -20,25 +20,18 @@ namespace Calyptus.MVC.RoutingEngines
 
         public AttributeRoutingEngine(ICollection assemblies)
         {
-			List<IControllerBinding> controllers = new List<IControllerBinding>();
+			List<IEntryControllerBinding> controllers = new List<IEntryControllerBinding>();
 
 			foreach (Assembly a in assemblies)
 				foreach (Type t in a.GetTypes())
 				{
-					object[] attributes = t.GetCustomAttributes(typeof(IControllerBinding), false);
-					foreach (IControllerBinding attr in attributes)
+					object[] attributes = t.GetCustomAttributes(typeof(IEntryControllerBinding), false);
+					foreach (IEntryControllerBinding attr in attributes)
 					{
 						attr.Initialize(t);
 						controllers.Add(attr);
 					}
 				}
-
-			// Sorting hack to ensure keywords are prioritized before bindings
-			if (controllers.Count > 0)
-			{
-				controllers.Sort((c1, c2) => c1 is DefaultControllerAttribute ? (c2 is DefaultControllerAttribute ? 0 : 1) : (c2 is DefaultControllerAttribute ? -1 : 0));
-				_controllers = controllers.ToArray();
-			}
 		}
 
 		public IHttpHandler ParseRoute(IHttpContext context, IPathStack path)
@@ -46,7 +39,7 @@ namespace Calyptus.MVC.RoutingEngines
 			if (_controllers == null)
 				return null;
 
-			foreach (IControllerBinding c in _controllers)
+			foreach (IEntryControllerBinding c in _controllers)
 			{
 				IHttpHandler handler;
 				int index = path.Index;
@@ -83,6 +76,11 @@ namespace Calyptus.MVC.RoutingEngines
 		public string GetAbsolutePath<T>(Expression<Action<T>> action)
 		{
 			throw new NotImplementedException();
+		}
+
+		public RouteTree RouteTree
+		{
+			get { throw new NotImplementedException(); }
 		}
 	}
 }

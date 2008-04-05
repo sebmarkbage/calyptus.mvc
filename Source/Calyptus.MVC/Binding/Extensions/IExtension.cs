@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
 	public interface IExtension
 	{
 		void Initialize(MemberInfo target);
-		void TryMapping(IHttpContext context);
 
-		void OnPreAction(IHttpContext context, object[] parameters);
+		void OnBeforeAction(IHttpContext context, object[] parameters);
 		bool OnError(IHttpContext context, Exception error);
-		void OnPostAction(IHttpContext context, object returnValue);
+		void OnAfterAction(IHttpContext context, object returnValue);
+		void OnBeforeRender(IHttpContext context, IView view);
+		void OnAfterRender(IHttpContext context, IView view);
 	}
 }

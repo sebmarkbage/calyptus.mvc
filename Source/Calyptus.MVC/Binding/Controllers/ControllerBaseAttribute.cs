@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Calyptus.MVC.RoutingEngines;
 using System.Web;
 using System.Web.SessionState;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
-	public abstract class ControllerBaseAttribute : ControllerOptionsAttribute, IControllerBinding
+	public abstract class ControllerBaseAttribute : Attribute, IControllerBinding
 	{
 		protected IList<IMappingBinding> Mappings;
 
@@ -20,6 +19,12 @@ namespace Calyptus.MVC.Binding
 		private Type _controllerType;
 
 		private IExtension[] _extensions;
+
+		// OnBeforeActionDelegate
+		// OnAfterActionDelegate
+		// OnBeforeRenderDelegate
+		// OnAfterRenderDelegate
+		// DisposeDelegate
 
 		protected ControllerBaseAttribute()
 		{
@@ -86,13 +91,13 @@ namespace Calyptus.MVC.Binding
 			foreach (IActionBinding b in _bindings)
 				if (b.TryBinding(context, path, out parameters, out overloadWeight))
 				{
-					object controller = Activator.CreateInstance(_controllerType);
-
-					// Bind properties
-
-					h.Controller = controller;
-					h.ControllerExtensions = _extensions;
-					handler = h;
+					handler = new ActionHandler
+					{
+						Arguments = parameters,
+						Controller = Activator.CreateInstance(_controllerType),
+						ControllerExtensions = _extensions,
+						Context = context
+					};
 					return true;
 				}
 				else
@@ -110,16 +115,17 @@ namespace Calyptus.MVC.Binding
 					b.SerializePath(path, arguments);
 					return;
 
-			throw new Exception(String.Format("Method \"{0}\" is not bindable.", method.Name));
+			throw new BindingException(String.Format("Method \"{0}\" is not bindable.", method.Name));
 		}
 
-		private class ActionHandler : IHttpHandler, IRequiresSessionState
+		private class ActionHandler : IHttpAsyncHandler, IRequiresSessionState
 		{
 			public object Controller { get; set; }
 			public IExtension[] ControllerExtensions { get; set; }
 			public IExtension[] ActionExtensions { get; set; }
 			public MethodInfo Method { get; set; }
 			public object[] Arguments { get; set; }
+			public IHttpContext Context { get; set; }
 
 			public ActionHandler()
 			{
@@ -132,21 +138,22 @@ namespace Calyptus.MVC.Binding
 
 			public void ProcessRequest(HttpContext context)
 			{
-				ProcessRequest(new VirtualHttpContext(context));
+				ProcessRequest(Context);
 			}
 
 			public void ProcessRequest(IHttpContext context)
 			{
 				if (ControllerExtensions != null)
 					foreach (IExtension ext in ControllerExtensions)
-						ext.OnPreAction(context);
+						ext.OnBeforeAction(context, Arguments);
 				if (ActionExtensions != null)
 					foreach (IExtension ext in ActionExtensions)
-						ext.OnPreAction(context);
+						ext.OnBeforeAction(context, Arguments);
 
+				object returnValue;
 				try
 				{
-					Method.Invoke(Controller, Arguments);
+					returnValue = Method.Invoke(Controller, Arguments);
 				}
 				catch (Exception e)
 				{
@@ -161,14 +168,25 @@ namespace Calyptus.MVC.Binding
 								catched = true;
 					if (!catched)
 						throw e;
+					return;
 				}
 
 				if (ActionExtensions != null)
 					foreach (IExtension ext in ActionExtensions)
-						ext.OnPostAction(context);
+						ext.OnAfterAction(context, returnValue);
 				if (ControllerExtensions != null)
 					foreach (IExtension ext in ControllerExtensions)
-						ext.OnPostAction(context);
+						ext.OnAfterAction(context, returnValue);
+			}
+
+			public IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback callback, object state)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void EndProcessRequest(IAsyncResult result)
+			{
+				throw new NotImplementedException();
 			}
 		}
 	}

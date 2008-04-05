@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Reflection;
+using System.Web;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
 	interface IControllerBinding
 	{
 		void Initialize(Type controllerType);
 		bool TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler);
-		void SerializeToPath(IPathStack path, MethodInfo method, object[] arguments);
+		void SerializeToPath(IPathStack path, MethodInfo method, object[] parameters);
 	}
 }

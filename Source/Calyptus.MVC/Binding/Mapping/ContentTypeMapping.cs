@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Calyptus.MVC.Binding.Mapping
+namespace Calyptus.MVC.Mapping
 {
 	public class ContentTypeMapping : IMappingBinding
 	{
@@ -23,7 +23,7 @@ namespace Calyptus.MVC.Binding.Mapping
 			}
 		}
 
-		bool TryMapping(IHttpContext context, IPathStack path)
+		public bool TryMapping(IHttpContext context, IPathStack path)
 		{
 			string ct = context.Request.ContentType;
 			int s = ct.IndexOf(';');
@@ -34,7 +34,7 @@ namespace Calyptus.MVC.Binding.Mapping
 			return false;
 		}
 
-		void SerializeToPath(IPathStack path)
+		public void SerializeToPath(IPathStack path)
 		{
 		}
 	}

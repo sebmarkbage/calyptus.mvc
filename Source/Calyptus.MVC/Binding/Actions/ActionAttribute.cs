@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Calyptus.MVC.Helpers;
 using System.Reflection;
-using Calyptus.MVC.Binding.Mapping;
+using Calyptus.MVC.Mapping;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 	public class ActionAttribute : ActionBaseAttribute
 	{
 		public string Verb { set { Mappings.Add(new VerbMapping(value)); } }
-		public string ContentType { set { Mappings.Add(new ContentTypeMapping(value)); } }
+		public string RequestType { set { Mappings.Add(new ContentTypeMapping(value)); } }
 		public string Path { set { Mappings.Add(new PathMapping(value)); } }
 		
 		/*

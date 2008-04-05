@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Calyptus.MVC.Binding.Mapping
+namespace Calyptus.MVC.Mapping
 {
 	public class VerbMapping : IMappingBinding
 	{
 		private string[] verbs;
 
-		public VerbMapping(string verbs) : base(verbs == null || verbs.Trim() == "" || verbs.Trim() == "*" ? null : verbs.Split(',')) { }
+		public VerbMapping(string verbs) : this(verbs == null || verbs.Trim() == "" || verbs.Trim() == "*" ? null : verbs.Split(',')) { }
 
 		public VerbMapping(string[] verbs)
 		{

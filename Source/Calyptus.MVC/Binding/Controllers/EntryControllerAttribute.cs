@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Calyptus.MVC.RoutingEngines;
+using Calyptus.MVC;
 using System.Web;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
-	public class EntryControllerAttribute : ControllerBaseAttribute
+	public class EntryControllerAttribute : ControllerBaseAttribute, IEntryControllerBinding
     {
 		public string Path { set { this.Mappings.Add(new Mapping.PathMapping(value)); } }
 

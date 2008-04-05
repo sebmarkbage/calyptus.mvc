@@ -41,7 +41,9 @@ namespace Calyptus.MVC
 
             IPathStack stack = new PathStack(path, context.Request.QueryString, true);
 
-			IHttpHandler handler = Config.GetRoutingEngine().ParseRoute(new VirtualHttpContext(context), stack);
+			IRoutingEngine routing = Config.GetRoutingEngine();
+			IViewFactory viewFactory = Config.GetViewFactory();
+			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, routing, viewFactory), stack);
 			if (handler != null)
 			{
 				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path };

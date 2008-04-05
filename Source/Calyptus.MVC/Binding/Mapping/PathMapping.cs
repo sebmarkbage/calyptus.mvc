@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Globalization;
 using System.Resources;
 
-namespace Calyptus.MVC.Binding.Mapping
+namespace Calyptus.MVC.Mapping
 {
 	public class PathMapping : IMappingBinding
 	{
@@ -15,6 +15,11 @@ namespace Calyptus.MVC.Binding.Mapping
 		public PathMapping(string path)
 		{
 			this.keywords = path.Trim('/').Split('/');
+		}
+
+		public override string ToString()
+		{
+			return string.Join("/", keywords);
 		}
 
 		public bool TryMapping(IHttpContext context, IPathStack path)

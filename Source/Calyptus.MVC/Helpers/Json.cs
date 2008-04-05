@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Web;
 
-namespace Calyptus.MVC.Helpers
+namespace Calyptus.MVC
 {
 	public static class Json
 	{

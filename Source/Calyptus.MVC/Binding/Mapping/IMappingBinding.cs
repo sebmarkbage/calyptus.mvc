@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Collections.Specialized;
 using System.Globalization;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
     public interface IMappingBinding
     {

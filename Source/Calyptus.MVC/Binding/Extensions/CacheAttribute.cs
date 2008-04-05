@@ -5,7 +5,7 @@ using System.Text;
 using System.Web;
 using System.Reflection;
 
-namespace Calyptus.MVC.Binding
+namespace Calyptus.MVC
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class CacheAttribute : Attribute, IExtension
@@ -24,20 +24,19 @@ namespace Calyptus.MVC.Binding
 
 		public void Initialize(MemberInfo target) { }
 
-		public void TryMapping(IHttpContext context) { }
+		public void OnBeforeAction(IHttpContext context, object[] parameters) {}
 
-		public void OnPreAction(IHttpContext context) { }
-
-		public void OnPostAction(IHttpContext context)
+		public void OnAfterAction(IHttpContext context, object returnValue)
 		{
 			context.Response.Cache.SetCacheability(Cacheability);
 			if (_durationSet)
 				context.Response.Cache.SetExpires(DateTime.Now.AddSeconds((double)_duration));
 		}
 
-		public bool OnError(IHttpContext context, Exception error)
-		{
-			return true;
-		}
+		public bool OnError(IHttpContext context, Exception error) { return true; }
+
+		public void OnBeforeRender(IHttpContext context, IView view) { }
+
+		public void OnAfterRender(IHttpContext context, IView view) { }
 	}
 }

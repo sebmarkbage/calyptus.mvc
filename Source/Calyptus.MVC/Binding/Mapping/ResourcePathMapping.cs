@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Globalization;
+using System.Resources;
 
-namespace Calyptus.MVC.Binding.Mapping
+namespace Calyptus.MVC.Mapping
 {
 	public class ResourcePathMapping : IMappingBinding
 	{
@@ -26,7 +27,7 @@ namespace Calyptus.MVC.Binding.Mapping
 					{
 						ResourceManager mgr = new ResourceManager(basename, assembly);
 						keywords = mgr.GetString(name, c).Trim('/').Split('/');
-						cultureCache.Add(c.LCID, keywords);
+						cultureCache.Add(c, keywords);
 					}
 				}
 				return keywords;
