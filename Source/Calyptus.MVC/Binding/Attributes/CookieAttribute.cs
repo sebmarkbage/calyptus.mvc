@@ -14,7 +14,7 @@ namespace Calyptus.MVC
 		private bool _complexType;
 		private string _name;
 
-		public string Name { get { return _name; } set { if (value == null) throw new NullReferenceException("Session key cannot be null"); _name = value; } }
+		public string Name { get { return _name; } set { if (value == null) throw new NullReferenceException("Cookie name cannot be null"); _name = value; } }
 
 		public bool Secure { get; set; }
 		public bool HttpOnly { get; set; }

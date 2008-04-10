@@ -6,6 +6,10 @@ using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
 using System.ComponentModel;
+using System.Xml.Serialization;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace Calyptus.MVC
 {
@@ -13,42 +17,57 @@ namespace Calyptus.MVC
     {
 		protected IList<IMappingBinding> Mappings;
 
-		protected IParameterBinding[][] Bindings;
+		protected struct ParamBindings
+		{
+			public IParameterBinding[] Bindings;
+			public IBindingConstraint[] Constraints;
+			public bool IsIn;
+			public bool IsOut;
+		}
+
+		//protected IParameterBinding[][] Bindings;
+		//protected bool[] IsOutBindings;
+		//protected IBindingConstraint[][] Constraints;
+		protected ParamBindings[] Bindings;
 		protected IExtension[] Extensions;
 
-		// AsyncEndDelegate
-		// OnBeforeActionDelegate
-		// OnAfterActionDelegate
+		public virtual string ResponseType { get; set; }
 
-		protected Type DefaultParameterBinderType = typeof(ParamAttribute);
-
-		public virtual string View { get; set; }
-		public virtual string Master { get; set; }
-		public virtual IViewFactory ViewEngine { get; set; }
+		protected virtual Type DefaultParameterBinderType { get { return typeof(ParamAttribute); } }
 
 		public ActionBaseAttribute() : this(null) { }
 
+		private Type _returnType;
+
 		public ActionBaseAttribute(IEnumerable<IMappingBinding> mappings)
 		{
-			this.Mappings = new List<IMappingBinding>(mappings);
+			this.Mappings = mappings == null ? new List<IMappingBinding>() : new List<IMappingBinding>(mappings);
 		}
 
-		public virtual void Initialize(MethodInfo method)
+		void IActionBinding.Initialize(MethodInfo method)
 		{
 			if (Bindings != null)
 				return;
 
+			_returnType = method.ReturnType;
+
 			ParameterInfo[] parameters = method.GetParameters();
 
 			if (parameters.Length == 0)
+			{
+				Initialize(method);
 				return;
+			}
 
-			Bindings = new IParameterBinding[parameters.Length][];
+			Bindings = new ParamBindings[parameters.Length];
 
 			for (int i = 0; i < parameters.Length; i++)
 			{
-				IParameterBinding[] bindings;
 				ParameterInfo p = parameters[i];
+
+				IParameterBinding[] bindings;
+				IBindingConstraint[] constraints;
+
 				object[] atts = p.GetCustomAttributes(typeof(IParameterBinding), true);
 				if (atts.Length > 0)
 				{
@@ -56,6 +75,12 @@ namespace Calyptus.MVC
 					for (int a = 0; a < atts.Length; a++)
 					{
 						IParameterBinding b = (IParameterBinding)atts[a];
+						if (b is DefaultAttribute)
+						{
+							b = ContextAttribute.IsContextType(p.ParameterType) ?
+								new ContextAttribute() :
+								(IParameterBinding)Activator.CreateInstance(DefaultParameterBinderType);
+						}
 						b.Initialize(p);
 						bindings[a] = b;
 					}
@@ -69,7 +94,30 @@ namespace Calyptus.MVC
 					b.Initialize(p);
 					bindings = new IParameterBinding[] { b };
 				}
-				Bindings[i] = bindings;
+
+				atts = p.GetCustomAttributes(typeof(IBindingConstraint), true);
+				if (atts.Length > 0)
+				{
+					constraints = new IBindingConstraint[atts.Length];
+					for (int a = 0; a < atts.Length; a++)
+					{
+						IBindingConstraint c = (IBindingConstraint)atts[a];
+						c.Initialize(p);
+						constraints[a] = c;
+					}
+				}
+				else
+				{
+					constraints = null;
+				}
+
+				Bindings[i] = new ParamBindings
+				{
+					Bindings = bindings,
+					Constraints = constraints,
+					IsIn = !p.IsOut,
+					IsOut = p.ParameterType.IsByRef
+				};
 			}
 
 			object[] exts = method.GetCustomAttributes(typeof(IExtension), true);
@@ -83,14 +131,19 @@ namespace Calyptus.MVC
 					Extensions[i] = ext;
 				}
 			}
+			Initialize(method);
 		}
 
-		public virtual bool TryBinding(IHttpContext context, IPathStack path, out object[] arguments, out int overloadWeight)
+		protected virtual void Initialize(MethodInfo method)
+		{
+		}
+
+		bool IActionBinding.TryBinding(IHttpContext context, IPathStack path, out object[] parameters, out int overloadWeight)
 		{
 			foreach (IMappingBinding mapping in this.Mappings)
 				if (!mapping.TryMapping(context, path))
 				{
-					arguments = null;
+					parameters = null;
 					overloadWeight = 0;
 					return false;
 				}
@@ -100,103 +153,220 @@ namespace Calyptus.MVC
 			//    if (!extension.TryMapping(context, path))
 			//        return false;
 
-			if (!path.IsAtEnd)
-			{
-				arguments = null;
-				overloadWeight = 0;
-				return false;
-			}
+			overloadWeight = Mappings.Count * 10000;
 
 			if (Bindings == null)
 			{
-				arguments = null;
-				overloadWeight = 0;
+				parameters = null;
 				return true;
 			}
 
 			int l = Bindings.Length;
-			arguments = new object[Bindings.Length];
-			overloadWeight = Mappings.Count;
+			parameters = new object[Bindings.Length];
 			for (int i = 0; i < l; i++)
 			{
-				bool bound = false;
-				int index = path.Index;
-				foreach (IParameterBinding bindable in Bindings[i])
+				ParamBindings pb = Bindings[i];
+				if (pb.IsIn)
 				{
-					object obj;
-					int weight;
-					if (bindable.TryBinding(context, path, out obj, out weight))
+					bool bound = false;
+					int index = path.Index;
+					foreach (IParameterBinding bindable in pb.Bindings)
 					{
-						overloadWeight += weight;
-						arguments[i] = obj;
-						bound = true;
-						break;
+						object obj;
+						int weight;
+						if (bindable.TryBinding(context, path, out obj, out weight))
+						{
+							bool constrained = false;
+							if (pb.Constraints != null)
+								foreach (IBindingConstraint constraint in pb.Constraints)
+									if (!constraint.TryConstraint(context, obj))
+									{
+										constrained = true;
+										break;
+									}
+							if (!constrained)
+							{
+								overloadWeight += weight;
+								parameters[i] = obj;
+								bound = true;
+								break;
+							}
+						}
+						else
+						{
+							path.ReverseToIndex(index);
+						}
 					}
-					else
+					if (!bound)
 					{
-						path.ReverseToIndex(index);
+						overloadWeight = 0;
+						parameters = null;
+						return false;
 					}
-				}
-				if (!bound)
-				{
-					overloadWeight = 0;
-					arguments = null;
-					return false;
 				}
 			}
 			return true;
 		}
 
-		public virtual void SerializePath(IPathStack path, object[] arguments)
+		void IActionBinding.SerializePath(IPathStack path, object[] parameters)
 		{
+			if (Mappings != null)
+				foreach (IMappingBinding mapping in Mappings)
+					mapping.SerializeToPath(path);
+
+			if (Bindings == null) return;
+
 			int l = Bindings.Length;
 
-			if (arguments.Length != l)
-				throw new BindingException("Wrong number of arguments.");
+			if (parameters.Length != l)
+				throw new BindingException("Wrong number of parameters.");
 
 			for (int i = 0; i < l; i++)
 			{
-				IParameterBinding[] b = Bindings[i];
-				for (int ii = 0; ii < b.Length; ii++)
+				ParamBindings pb = Bindings[i];
+				foreach(IParameterBinding b in pb.Bindings)
 				{
-					IParameterBinding bb = b[ii];
 					int index = path.Index;
-					bb.SerializePath(path, arguments[i]);
-					if (path.Index > index)
+					int count = path.QueryString.Count;
+					b.SerializePath(path, parameters[i]);
+					if (path.Index > index || path.QueryString.Count > count)
 						break;
 				}
 			}
 		}
 
-		public void OnBeforeAction(IHttpContext context, object[] parameters)
+		void IActionBinding.OnBeforeAction(IHttpContext context, BeforeActionEventArgs args)
+		{
+			OnBeforeAction(context, args);
+		}
+
+		void IActionBinding.OnAfterAction(IHttpContext context, AfterActionEventArgs args)
+		{
+			OnAfterAction(context, args);
+		}
+
+		void IActionBinding.OnError(IHttpContext context, ErrorEventArgs args)
+		{
+			OnError(context, args);
+		}
+
+		void IActionBinding.OnRender(IHttpContext context, object value)
+		{
+			OnRender(context, value);
+		}
+
+		protected virtual void OnBeforeAction(IHttpContext context, BeforeActionEventArgs args)
 		{
 			// Raise OnBeforeActionDelegate
 		}
 
-		public void OnAfterAction(IHttpContext context, object returnValue)
+		protected virtual void OnAfterAction(IHttpContext context, AfterActionEventArgs args)
 		{
+			// Store out variables
+
+			if (Bindings == null) return;
+
+			int l = Bindings.Length;
+			for (int i = 0; i < l; i++)
+			{
+				ParamBindings pb = Bindings[i];
+				if (pb.IsOut)
+					foreach (IParameterBinding bindable in pb.Bindings)
+						bindable.StoreBinding(context, args.Parameters[i]);
+			}
+
 			// Raise OnAfterActionDelegate
 		}
 
-		public void OnRender(IHttpContext context, object value)
+		protected virtual void OnRender(IHttpContext context, object value)
 		{
+			if (ResponseType != null) context.Response.ContentType = ResponseType;
+
 			IViewTemplate template = value as IViewTemplate;
 			if (template != null)
 			{
-				// Find View
+				IView view = context.ViewFactory != null ? context.ViewFactory.FindView(context, template) : null;
+				if (view != null)
+					value = view;
+				else if (!(template is IRenderable))
+					value = MockViewFactory.CreateView(context, template);
 			}
+
 			IRenderable renderable = value as IRenderable;
 			if (renderable != null)
 			{
 				renderable.Render(context);
 				return;
 			}
-			// Use serializer
+
+			Stream stream = value as Stream;
+			if (stream != null)
+			{
+				WriteStream(stream, context.Response);
+				return;
+			}
+
+			string requestType = context.Request.ContentType;
+			if (IsJson(ResponseType) || (ResponseType == null && (IsJson(requestType) || "JSON".Equals(context.Request.Headers["X-Request"], StringComparison.InvariantCultureIgnoreCase) || AcceptJsonBeforeXml(context.Request.AcceptTypes))))
+			{
+				if (ResponseType == null) context.Response.ContentType = "application/json";
+				if (value == null && _returnType == null) context.Response.Write("null");
+				else
+				{
+					var serializer = new DataContractJsonSerializer(value == null ? _returnType : value.GetType());
+					context.Response.Charset = context.Response.ContentEncoding.WebName;
+					var writer = JsonReaderWriterFactory.CreateJsonWriter(context.Response.OutputStream, context.Response.ContentEncoding);
+					serializer.WriteObject(writer, value);
+					writer.Close();
+				}
+			}
+			else if (ResponseType == null || IsXml(ResponseType))
+			{
+				if (ResponseType == null) context.Response.ContentType = "application/xml";
+				if (value != null || _returnType != null)
+				{
+					var serializer = new DataContractSerializer(value == null ? _returnType : value.GetType());
+					var writer = System.Xml.XmlDictionaryWriter.Create(context.Response.Output);
+					serializer.WriteObject(writer, value);
+					writer.Close();
+				}
+			}
 		}
 
-		public bool OnError(IHttpContext context, Exception error)
+		private bool AcceptJsonBeforeXml(string[] acceptTypes)
 		{
-			return true;
+			foreach (string type in acceptTypes)
+				if (IsJson(type))
+					return true;
+				else if (IsXml(type))
+					return false;
+			return false;
+		}
+
+		private bool IsJson(string mime)
+		{
+			return mime != null && (mime.EndsWith("/json", StringComparison.InvariantCultureIgnoreCase) || mime.EndsWith("+json", StringComparison.InvariantCultureIgnoreCase));
+		}
+
+		private bool IsXml(string mime)
+		{
+			return mime != null && (mime.EndsWith("/xml", StringComparison.InvariantCultureIgnoreCase) || mime.EndsWith("+xml", StringComparison.InvariantCultureIgnoreCase));
+		}
+
+		private void WriteStream(Stream stream, IHttpResponse response)
+		{
+			response.Buffer = false;
+			int BufferSize = 65536;
+			byte[] bytes = new byte[BufferSize];
+			int numBytes;
+			while ((numBytes = stream.Read(bytes, 0, BufferSize)) > 0)
+				response.OutputStream.Write(bytes, 0, numBytes);
+			stream.Close();
+		}
+
+		protected virtual void OnError(IHttpContext context, ErrorEventArgs args)
+		{
+
 		}
 	}
 }

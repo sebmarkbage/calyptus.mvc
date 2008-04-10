@@ -10,10 +10,10 @@ namespace Calyptus.MVC
 	{
 		void Initialize(MemberInfo target);
 
-		void OnBeforeAction(IHttpContext context, object[] parameters);
-		bool OnError(IHttpContext context, Exception error);
-		void OnAfterAction(IHttpContext context, object returnValue);
-		void OnBeforeRender(IHttpContext context, IView view);
-		void OnAfterRender(IHttpContext context, IView view);
+		void OnBeforeAction(IHttpContext context, BeforeActionEventArgs args);
+		void OnError(IHttpContext context, ErrorEventArgs args);
+		void OnAfterAction(IHttpContext context, AfterActionEventArgs args);
+		void OnBeforeRender(IHttpContext context, BeforeRenderEventArgs args);
+		void OnAfterRender(IHttpContext context, AfterRenderEventArgs args);
 	}
 }

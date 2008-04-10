@@ -7,7 +7,7 @@ namespace Calyptus.MVC
 {
 	public class CompiledViewFactory : IViewFactory
 	{
-		public IView CreateTemplate(IHttpContext context, IViewTemplate view)
+		public IView FindView(IHttpContext context, IViewTemplate view)
 		{
 			throw new NotImplementedException();
 		}

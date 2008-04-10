@@ -10,8 +10,6 @@ namespace Calyptus.MVC
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple=true, Inherited=false)]
 	public class ParamAttribute : Attribute, IParameterBinding
 	{
-		public string ValidationRegEx { get; set; }
-
 		public ParamAttribute()
 		{
 		}
@@ -58,6 +56,11 @@ namespace Calyptus.MVC
 		{
 			if (obj != null)
 				nameValues.Add(_name, obj.ToString());
+		}
+
+		public void StoreBinding(IHttpContext context, object value)
+		{
+
 		}
 	}
 }

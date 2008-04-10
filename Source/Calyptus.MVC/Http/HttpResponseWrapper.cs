@@ -347,6 +347,14 @@ namespace Calyptus.MVC
 			}
 		}
 
+		Stream IHttpResponse.OutputStream
+		{
+			get
+			{
+				return this._httpResponse.OutputStream;
+			}
+		}
+
 		string IHttpResponse.RedirectLocation
 		{
 			get

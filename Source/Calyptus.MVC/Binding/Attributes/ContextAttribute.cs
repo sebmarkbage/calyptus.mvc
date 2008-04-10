@@ -12,9 +12,12 @@ namespace Calyptus.MVC
 	public class ContextAttribute : Attribute, IPropertyBinding, IParameterBinding
 	{
 		private Func<IHttpContext, object> binder;
+		private bool isPrincipal;
+		private bool isPathStack;
 
 		public void Initialize(ParameterInfo parameter)
 		{
+			if (parameter.ParameterType == typeof(IPathStack)) { isPathStack = true; return; }
 			binder = GetBinder(parameter.ParameterType);
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", parameter.ParameterType.Name));
 		}
@@ -22,12 +25,14 @@ namespace Calyptus.MVC
 		public void Initialize(PropertyInfo property)
 		{
 			binder = GetBinder(property.PropertyType);
+			isPrincipal = property.PropertyType == typeof(IPrincipal);
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", property.PropertyType.Name));
 		}
 
 		public bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
 		{
 			overloadWeight = 0;
+			if (isPathStack) { obj = path; return true; }
 			return TryBinding(context, out obj);
 		}
 
@@ -39,7 +44,7 @@ namespace Calyptus.MVC
 
 		public static bool IsContextType(Type type)
 		{
-			return GetBinder(type) != null;
+			return type == typeof(IPathStack) || GetBinder(type) != null;
 		}
 
 		private static Func<IHttpContext, object> GetBinder(Type type)
@@ -54,8 +59,9 @@ namespace Calyptus.MVC
 			else if (type == typeof(IHttpContext)) return c => c;
 			else if (type == typeof(IHttpRequest)) return c => c.Request;
 			else if (type == typeof(IHttpResponse)) return c => c.Response;
-			else if (type == typeof(IRoutingEngine)) return c => c.RoutingEngine;
-			else if (type == typeof(IViewFactory)) return c => c.TemplateEngine;
+			else if (type == typeof(IRouteContext)) return c => c.Route;
+			else if (type == typeof(IRoutingEngine)) return c => c.Route.RoutingEngine;
+			else if (type == typeof(IViewFactory)) return c => c.ViewFactory;
 			else return null;
 		}
 
@@ -66,7 +72,8 @@ namespace Calyptus.MVC
 
 		public void StoreBinding(IHttpContext context, object value)
 		{
-			// Exclude
+			if (isPrincipal) context.User = (IPrincipal)value;
+			// Else Exclude
 		}
 
 	}

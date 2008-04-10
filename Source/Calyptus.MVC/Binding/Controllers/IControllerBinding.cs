@@ -10,7 +10,7 @@ namespace Calyptus.MVC
 	interface IControllerBinding
 	{
 		void Initialize(Type controllerType);
-		bool TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler);
-		void SerializeToPath(IPathStack path, MethodInfo method, object[] parameters);
+		bool TryBinding(IHttpContext context, IPathStack path, object parentController, out IHttpHandler handler);
+		void SerializeToPath(IRouteAction action, IPathStack path);
 	}
 }

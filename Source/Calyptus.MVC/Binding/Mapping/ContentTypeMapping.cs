@@ -11,7 +11,7 @@ namespace Calyptus.MVC.Mapping
 
 		public ContentTypeMapping(string contentType) : this(contentType == null || contentType.Trim() == "" || contentType.Trim() == "*" ? null : new string[] { contentType }) { }
 
-		public ContentTypeMapping(string[] contentTypes)
+		public ContentTypeMapping(params string[] contentTypes)
 		{
 			if (contentTypes == null) return;
 			this.contentTypes = new string[contentTypes.Length];
@@ -36,6 +36,11 @@ namespace Calyptus.MVC.Mapping
 
 		public void SerializeToPath(IPathStack path)
 		{
+		}
+
+		public override string ToString()
+		{
+			return string.Join(", ", contentTypes);
 		}
 	}
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Calyptus.MVC
 {
-	public class RoutingView : IRenderable
+	public class SiteMapView : IRenderable
 	{
 		public void Render(IHttpContext context)
 		{

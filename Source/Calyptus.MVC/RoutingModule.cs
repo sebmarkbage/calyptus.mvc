@@ -39,11 +39,12 @@ namespace Calyptus.MVC
 
 			string path = ((l <= 0 ? null : request.AppRelativeCurrentExecutionFilePath.Substring(2, l)) + request.PathInfo);
 
-            IPathStack stack = new PathStack(path, context.Request.QueryString, true);
+            PathStack stack = new PathStack(path, context.Request.QueryString, true);
 
 			IRoutingEngine routing = Config.GetRoutingEngine();
 			IViewFactory viewFactory = Config.GetViewFactory();
-			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, routing, viewFactory), stack);
+
+			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, new RouteContext(routing, request.ApplicationPath, stack.Count, stack.TrailingSlash), viewFactory), stack);
 			if (handler != null)
 			{
 				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path };

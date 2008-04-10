@@ -1,19 +1,24 @@
 ﻿using System;
+using System.IO;
 
 namespace Calyptus.MVC
 {
 	public interface IView : IViewTemplate, IRenderable
 	{
+		string ContentType { get; }
+		void Render(Stream stream);
 	}
 
-	public interface IView<TemplateType> : IView where TemplateType : IViewTemplate
+	public interface IView<TTemplate> : IView where TTemplate : class, IViewTemplate
 	{
-		void Render(IHttpContext context, TemplateType view);
+		TTemplate Template { get; set; }
 	}
 
-	public interface IView<TemplateType, MasterType> : IView<TemplateType> where TemplateType : IViewTemplate<MasterType> where MasterType : IViewTemplate
+	public interface IView<TTemplate, TMaster> : IView<TTemplate>
+		where TTemplate : class, IViewTemplate<TMaster>
+		where TMaster : class, IViewTemplate
 	{
-		IView<MasterType> Master { get; set; }
+		IView<TMaster> Master { get; set; }
 	}
 
 }

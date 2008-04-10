@@ -1,13 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
 using Calyptus.MVC;
 using System.Net;
 using System.IO;
@@ -17,13 +8,15 @@ public class BlogController : IController, IDisposable
 {
 	public RootController.MasterView Master { get; set; }
 
-	//[Action]
-	public IViewTemplate Index()
+	[Action, Path("Test")]
+	public IViewTemplate Index(IPathStack path)
 	{
-		return new Redirect<RootController>(r => r.Index(), true);
+		return new RootController.DefaultView { Title = "BlogsIndex", Path = path };
+		//return new Redirect<RootController>(r => r.Index(), true);
 	}
 
-	//[Get]
+	[Action(Verb="GET", Path="Edit1/Edit2")]
+	[Get("Edit")]
 	public IViewTemplate Edit([QueryString] int id)
 	{
 		return new EditView { Master = Master, ID = id, Title = "TEST Title" };
@@ -32,7 +25,7 @@ public class BlogController : IController, IDisposable
 	private WebRequest _request;
 	private WebResponse _response;
 
-	//[Post]
+	[Post]
 	public IAsyncResult BeginSave([QueryString] int id, [Form] string title, AsyncCallback callback, object state)
 	{
 		_request = WebRequest.Create("http://www.calyptus.se/");

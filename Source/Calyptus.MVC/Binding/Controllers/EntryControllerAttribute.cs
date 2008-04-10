@@ -5,16 +5,55 @@ using System.Text;
 using System.Reflection;
 using Calyptus.MVC;
 using System.Web;
+using Calyptus.MVC.Mapping;
 
 namespace Calyptus.MVC
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
 	public class EntryControllerAttribute : ControllerBaseAttribute, IEntryControllerBinding
     {
-		public string Path { set { this.Mappings.Add(new Mapping.PathMapping(value)); } }
+		protected IList<IMappingBinding> Mappings;
+
+		private IMappingBinding _path;
+		public string Path { get { return _path == null ? null : _path.ToString(); } set { if (_path != null) Mappings.Remove(_path); Mappings.Add(_path = new PathMapping(value)); } }
+
+		private string _pathResBaseName;
+		private string _pathResKey;
 
 		public EntryControllerAttribute()
 		{
+			Mappings = new List<IMappingBinding>();
+		}
+
+		public EntryControllerAttribute(string path) : this()
+		{
+			if (path != null)
+				Path = path;
+		}
+
+		public EntryControllerAttribute(string pathResourceBaseName, string pathResourceKey) : this()
+		{
+			_pathResBaseName = pathResourceBaseName;
+			_pathResKey = pathResourceKey;
+		}
+
+		public EntryControllerAttribute(string pathResourceAssembly, string pathResourceBaseName, string pathResourceKey) : this()
+		{
+			_path = new ResourcePathMapping(Assembly.Load(pathResourceAssembly), pathResourceBaseName, pathResourceKey);
+		}
+
+		public override void Initialize(Type controllerType)
+		{
+			if (_path == null && _pathResBaseName != null && _pathResKey != null)
+			{
+				_path = new ResourcePathMapping(controllerType.Assembly, _pathResBaseName, _pathResKey);
+				Mappings.Add(_path);
+				_pathResBaseName = null;
+				_pathResKey = null;
+			}
+
+			base.Initialize(controllerType);
+			if (Mappings.Count == 0) Mappings = null;
 		}
 
 		/*public override void Initialize(Type controllerType)
@@ -24,25 +63,26 @@ namespace Calyptus.MVC
 			base.Initialize(controllerType);
 		}*/
 
-		public override bool TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler)
+		bool IEntryControllerBinding.TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler)
 		{
-			foreach (IMappingBinding mapping in this.Mappings)
-				if (!mapping.TryMapping(context, path))
-				{
-					handler = null;
-					return false;
-				}
+			if (Mappings != null)
+				foreach (IMappingBinding mapping in this.Mappings)
+					if (!mapping.TryMapping(context, path))
+					{
+						handler = null;
+						return false;
+					}
 
-			return base.TryBinding(context, path, out handler);
+			return TryBinding(context, path, out handler);
 		}
 
-		public override void SerializeToPath(IPathStack path, MethodInfo method, object[] arguments)
+		void IEntryControllerBinding.SerializeToPath(IRouteAction action, IPathStack path)
 		{
-			foreach (IMappingBinding mapping in this.Mappings)
-				mapping.SerializeToPath(path);
+			if (Mappings != null)
+				foreach (IMappingBinding mapping in this.Mappings)
+					mapping.SerializeToPath(path);
 
-			base.SerializeToPath(path, method, arguments);
+			base.SerializeToPath(action, path);
 		}
-
 	}
 }

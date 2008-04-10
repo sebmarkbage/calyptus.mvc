@@ -10,5 +10,6 @@ namespace Calyptus.MVC
 	interface IEntryControllerBinding : IControllerBinding
 	{
 		bool TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler);
+		new void SerializeToPath(IRouteAction action, IPathStack path);
 	}
 }

@@ -36,10 +36,13 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq">
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel.Web">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -47,17 +50,28 @@
     <Compile Include="Binding\Actions\ActionAttribute.cs" />
     <Compile Include="Binding\Actions\ActionBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
+    <Compile Include="Binding\Attributes\DefaultAttribute.cs" />
+    <Compile Include="Binding\Attributes\BinderBaseAttribute.cs" />
+    <Compile Include="Binding\Attributes\DeleteAttribute.cs" />
+    <Compile Include="Binding\Attributes\PutAttribute.cs" />
     <Compile Include="Binding\BindingException.cs" />
+    <Compile Include="Binding\Constraints\IBindingConstraint.cs" />
+    <Compile Include="Binding\Constraints\RangeConstraintAttribute.cs" />
+    <Compile Include="Binding\Constraints\RegExpConstraintAttribute.cs" />
+    <Compile Include="Binding\Controllers\Helpers\HttpActionHandler.cs" />
+    <Compile Include="Binding\Controllers\Helpers\ActionHandler.cs" />
     <Compile Include="Binding\Controllers\IControllerBinding.cs" />
-    <Compile Include="Binding\Attributes\PostActionAttribute.cs" />
     <Compile Include="Binding\Attributes\ContextAttribute.cs" />
     <Compile Include="Binding\Controllers\ControllerAttribute.cs" />
+    <Compile Include="Binding\EventArgs\EventArgs.cs" />
+    <Compile Include="Binding\Extensions\AuthenticateAttribute.cs" />
+    <Compile Include="Binding\Extensions\RequiredRefererAttribute.cs" />
+    <Compile Include="Binding\Extensions\ForceHostAttribute.cs" />
+    <Compile Include="Binding\Extensions\ForceHttpsAttribute.cs" />
     <Compile Include="Binding\Mapping\ContentTypeMapping.cs" />
     <Compile Include="Binding\Mapping\HeaderMapping.cs" />
     <Compile Include="Binding\Mapping\ResourcePathMapping.cs" />
     <Compile Include="Binding\Mapping\VerbMapping.cs" />
-    <Compile Include="Binding\Attributes\FormAttribute.cs" />
-    <Compile Include="Binding\Attributes\QueryStringAttribute.cs" />
     <Compile Include="Binding\Controllers\EntryControllerAttribute.cs" />
     <Compile Include="Binding\Controllers\ControllerBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\GetAttribute.cs" />
@@ -72,9 +86,15 @@
     <Compile Include="Binding\Path\IPathSerializable.cs" />
     <Compile Include="Binding\Attributes\PathAttribute.cs" />
     <Compile Include="Binding\Properties\IPropertyBinding.cs" />
+    <Compile Include="Controllers\IEntryController.cs" />
     <Compile Include="Rendering\IRenderable.cs" />
-    <Compile Include="Rendering\RouteTreeView.cs" />
+    <Compile Include="RoutingEngines\IRouteContext.cs" />
+    <Compile Include="RoutingEngines\RouteContext.cs" />
+    <Compile Include="RoutingEngines\IRouteAction.cs" />
+    <Compile Include="RoutingEngines\RouteAction.cs" />
+    <Compile Include="RoutingEngines\SiteMapView.cs" />
     <Compile Include="RoutingEngines\RouteTree.cs" />
+    <Compile Include="ViewFactories\ViewFactoryBase.cs" />
     <Compile Include="Views\Redirect.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Controllers\Controller.cs" />
@@ -90,13 +110,13 @@
     <Compile Include="Http\IHttpContext.cs" />
     <Compile Include="Binding\Mapping\IMappingBinding.cs" />
     <Compile Include="RoutingEngines\AttributeRoutingEngine.cs" />
-    <Compile Include="Binding\Path\IPathStack.cs" />
+    <Compile Include="RoutingEngines\IPathStack.cs" />
     <Compile Include="RoutingEngines\IRoutingEngine.cs" />
     <Compile Include="ViewFactories\CompiledViewFactory.cs" />
     <Compile Include="ViewFactories\MockViewFactory.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="ViewFactories\IViewFactory.cs" />
-    <Compile Include="Binding\Path\PathStack.cs" />
+    <Compile Include="RoutingEngines\PathStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoutingHandler.cs" />
     <Compile Include="RoutingModule.cs" />

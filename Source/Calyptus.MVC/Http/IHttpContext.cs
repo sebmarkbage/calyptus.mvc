@@ -38,7 +38,7 @@ namespace Calyptus.MVC
 		TraceContext Trace { get; }
 		IPrincipal User { get; set; }
 
-		IRoutingEngine RoutingEngine { get; }
-		IViewFactory TemplateEngine { get; }
+		IViewFactory ViewFactory { get; }
+		IRouteContext Route { get; }
 	}
 }

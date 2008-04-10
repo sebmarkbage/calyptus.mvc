@@ -9,8 +9,8 @@ namespace Calyptus.MVC
 	{
 	}
 
-	public interface IViewTemplate<MasterType> : IViewTemplate where MasterType : IViewTemplate
+	public interface IViewTemplate<TMaster> : IViewTemplate where TMaster : IViewTemplate
 	{
-		MasterType Master { get; set; }
+		TMaster Master { get; set; }
 	}
 }

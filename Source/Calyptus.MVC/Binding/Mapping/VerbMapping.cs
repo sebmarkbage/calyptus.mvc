@@ -24,7 +24,6 @@ namespace Calyptus.MVC.Mapping
 			if (verbs == null)
 				return true;
 			string rv = context.Request.HttpMethod;
-			bool found = false;
 			foreach (string verb in verbs)
 				if (rv.Equals(verb))
 					return true;

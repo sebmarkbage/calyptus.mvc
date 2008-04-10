@@ -22,5 +22,8 @@ namespace Calyptus.MVC
 		void ReverseToIndex(int toIndex);
 		
 		void Push(string path);
+		void Push(IPathStack stack);
+
+		bool TrailingSlash { get; set; }
 	}
 }

@@ -6,35 +6,62 @@ using System.Linq.Expressions;
 
 namespace Calyptus.MVC
 {
-    public class ViewControl : System.Web.UI.UserControl
+    public class ViewControl : System.Web.UI.UserControl, IView
     {
         public new ViewPage Page { get { return (ViewPage)base.Page; } }
 
-		public IRoutingEngine Routing { get { return this.Page.Routing; } }
+		public IRouteContext Route { get { return this.Page.Route; } }
 
-		protected virtual string URL<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController>(Expression<Action<TRelativeController>> action) where TRelativeController : IController
 		{
-			return Routing.GetRelativePath<T>(int.MaxValue, action);
+			return Route.GetRelativePath<TRelativeController>(-1, action);
 		}
 
-		protected virtual string URL<T>(int index, Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController>(int index, Expression<Action<TRelativeController>> action) where TRelativeController : IController
 		{
-			return Routing.GetRelativePath<T>(index, action);
+			return Route.GetRelativePath<TRelativeController>(index, action);
 		}
 
-		protected virtual string URLReplace<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetReplacementPath<T>(int.MaxValue, action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(-1, 0, action);
 		}
 
-		protected virtual string URLReplace<T>(int index, Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetReplacementPath<T>(index, action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, 0, action);
 		}
 
-		protected virtual string URLAbsolute<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetAbsolutePath<T>(action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, action);
 		}
-    }
+
+		protected virtual string URLAbsolute<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController
+		{
+			return Route.GetAbsolutePath<TEntryController>(action);
+		}
+
+		public string ContentType
+		{
+			get { return ((IView)Page).ContentType; }
+		}
+
+		public void Render(System.IO.Stream stream)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Render(IHttpContext context)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class ViewControl<TTemplate> : ViewControl, IView<TTemplate> where TTemplate : class, IViewTemplate
+	{
+		public TTemplate Data { get; set; }
+
+		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+	}
 }

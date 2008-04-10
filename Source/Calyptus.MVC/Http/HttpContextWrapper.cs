@@ -15,14 +15,14 @@ namespace Calyptus.MVC
 		private IHttpResponse _response;
 		private IHttpSessionState _session;
 
-		public HttpContextWrapper(HttpContext context, IRoutingEngine routing, IViewFactory template)
+		public HttpContextWrapper(HttpContext context, IRouteContext route, IViewFactory viewFactory)
 		{
 			this._context = context;
 			this._request = new HttpRequestWrapper(context.Request);
 			this._response = new HttpResponseWrapper(context.Response);
 			this._session = new HttpSessionStateWrapper(context.Session);
-			this.RoutingEngine = routing;
-			this.TemplateEngine = template;
+			this.Route = route;
+			this.ViewFactory = viewFactory;
 		}
 
 		object IServiceProvider.GetService(Type serviceType)
@@ -237,8 +237,9 @@ namespace Calyptus.MVC
 			}
 		}
 
-		public IRoutingEngine RoutingEngine { get; private set; }
+		public IRoutingEngine RoutingEngine { get { return Route.RoutingEngine; } }
+		public IRouteContext Route { get; private set; }
 
-		public IViewFactory TemplateEngine { get; private set; }
+		public IViewFactory ViewFactory { get; private set; }
 	}
 }

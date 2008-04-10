@@ -63,6 +63,7 @@ namespace Calyptus.MVC
 		bool IsClientConnected { get; }
 		bool IsRequestBeingRedirected { get; }
 		TextWriter Output { get; }
+		Stream OutputStream { get; }
 		string RedirectLocation { get; set; }
 		string Status { get; set; }
 		int StatusCode { get; set; }

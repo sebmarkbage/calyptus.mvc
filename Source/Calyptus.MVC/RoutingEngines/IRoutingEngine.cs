@@ -4,17 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Calyptus.MVC
 {
     public interface IRoutingEngine
     {
 		IHttpHandler ParseRoute(IHttpContext context, IPathStack path);
-
-		RouteTree RouteTree { get; }
-
-		string GetRelativePath<T>(int index, Expression<Action<T>> action);
-		string GetReplacementPath<T>(int index, Expression<Action<T>> action);
-		string GetAbsolutePath<T>(Expression<Action<T>> action);
+		void SerializeAbsoutePath(IRouteAction action, IPathStack path);
+		void SerializeRelativePath(IRouteAction action, IPathStack path);
 	}
 }

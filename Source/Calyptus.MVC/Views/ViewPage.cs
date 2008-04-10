@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Reflection;
+using System.IO;
 
 namespace Calyptus.MVC
 {
@@ -13,57 +14,73 @@ namespace Calyptus.MVC
 
 		public new ViewPage Page { get { return (ViewPage)base.Page; } }
 
-        public IRoutingEngine Routing { get; set; }
+        public IRouteContext Route { get; set; }
 
-		protected virtual string URL<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController>(Expression<Action<TRelativeController>> action) where TRelativeController : IController
 		{
-			return Routing.GetRelativePath<T>(int.MaxValue, action);
+			return Route.GetRelativePath<TRelativeController>(-1, action);
 		}
 
-		protected virtual string URL<T>(int index, Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController>(int index, Expression<Action<TRelativeController>> action) where TRelativeController : IController
 		{
-			return Routing.GetRelativePath<T>(index, action);
+			return Route.GetRelativePath<TRelativeController>(index, action);
 		}
 
-		protected virtual string URLReplace<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetReplacementPath<T>(int.MaxValue, action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(-1, 0, action);
 		}
 
-		protected virtual string URLReplace<T>(int index, Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetReplacementPath<T>(index, action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, 0, action);
 		}
 
-		protected virtual string URLAbsolute<T>(Expression<Action<T>> action)
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
 		{
-			return Routing.GetAbsolutePath<T>(action);
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, action);
+		}
+
+		protected virtual string URLAbsolute<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController
+		{
+			return Route.GetAbsolutePath<TEntryController>(action);
+		}
+
+		string IView.ContentType
+		{
+			get
+			{
+				return Response.ContentType;
+			}
+		}
+
+		public void Render(Stream stream)
+		{
+			throw new NotImplementedException();
 		}
 
 		public void Render(IHttpContext context)
 		{
-			this.Routing = context.RoutingEngine;
+			this.Route = context.Route;
 			((IHttpHandler)this).ProcessRequest(context.ApplicationInstance.Context);
 		}
 	}
 
-    public class ViewPage<TemplateType> : ViewPage, IView<TemplateType> where TemplateType : IViewTemplate
+    public class ViewPage<TTemplate> : ViewPage, IView<TTemplate> where TTemplate : class, IViewTemplate
     {
-		public TemplateType Data { get; set; }
+		public TTemplate Data { get; set; }
 
-		public void Render(IHttpContext context, TemplateType template)
-		{
-			this.Data = template;
-			this.Render(context);
-		}
+		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
 	}
 
-	public class ViewPage<TemplateType, MasterType> : ViewPage<TemplateType>, IView<TemplateType, MasterType> where TemplateType : IViewTemplate<MasterType> where MasterType : IViewTemplate
+	public class ViewPage<TTemplate, TMaster> : ViewPage<TTemplate>, IView<TTemplate, TMaster>
+		where TTemplate : class, IViewTemplate<TMaster>
+		where TMaster : class, IViewTemplate
 	{
-		public new ViewMaster<MasterType> Master {
+		public new ViewMaster<TMaster> Master {
 			get
 			{
-				return (ViewMaster<MasterType>) base.Master;
+				return (ViewMaster<TMaster>) base.Master;
 			}
 			set
 			{
@@ -71,7 +88,7 @@ namespace Calyptus.MVC
 			}
 		}
 
-		IView<MasterType> IView<TemplateType, MasterType>.Master
+		IView<TMaster> IView<TTemplate, TMaster>.Master
 		{
 			get
 			{
@@ -80,7 +97,7 @@ namespace Calyptus.MVC
 			set
 			{
 				if (value == null) throw new NullReferenceException("WebForms Master not defined.");
-				ViewMaster<MasterType> master = value as ViewMaster<MasterType>;
+				ViewMaster<TMaster> master = value as ViewMaster<TMaster>;
 				if (master == null) throw new Exception(String.Format("Master '{0}' is not valid WebForms Master Page.", value.GetType().FullName));
 				this.Master = master;
 			}

@@ -7,6 +7,6 @@ namespace Calyptus.MVC
 {
     public interface IViewFactory
     {
-		IView CreateTemplate(IHttpContext context, IViewTemplate view);
+		IView FindView(IHttpContext context, IViewTemplate template);
 	}
 }

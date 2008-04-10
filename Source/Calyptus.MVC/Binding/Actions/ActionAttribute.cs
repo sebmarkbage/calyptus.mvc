@@ -10,24 +10,11 @@ namespace Calyptus.MVC
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 	public class ActionAttribute : ActionBaseAttribute
 	{
-		public string Verb { set { Mappings.Add(new VerbMapping(value)); } }
-		public string RequestType { set { Mappings.Add(new ContentTypeMapping(value)); } }
-		public string Path { set { Mappings.Add(new PathMapping(value)); } }
-		
-		/*
-		 * GET /Keyword
-		 * GET /?action=Keyword
-		 * GET /?Keyword=whatever
-		 * POST /   Content-Type: form/urlencoded / multipart/urlencoded    action=Keyword
-		 * POST /   Content-Type: form/urlencoded / multipart/urlencoded    Keyword=whatever
-		 * POST /   Content-Type: application/json      { 'action' : Keyword }
-		 * */
-
-		public override void Initialize(MethodInfo method)
-		{
-			//if (this.assembly == null)
-			//	this.assembly = method.DeclaringType.Assembly;
-		
-		}
+		private VerbMapping _verb;
+		public string Verb { get { return _verb == null ? null : _verb.ToString(); } set { if (_verb != null) Mappings.Remove(_verb); Mappings.Add(_verb = new VerbMapping(value)); } }
+		private ContentTypeMapping _contentType;
+		public string RequestType { get { return _contentType == null ? null : _contentType.ToString(); } set { if (_contentType != null) Mappings.Remove(_contentType); Mappings.Add(_contentType = new ContentTypeMapping(value)); } }
+		private PathMapping _path;
+		public string Path { get { return _path == null ? null : _path.ToString(); } set { if (_path != null) Mappings.Remove(_path); Mappings.Add(_path = new PathMapping(value)); } }
 	}
 }

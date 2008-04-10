@@ -7,21 +7,19 @@ using Calyptus.MVC.Mapping;
 
 namespace Calyptus.MVC
 {
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple=true, Inherited=false)]
-    public class PathAttribute : Attribute, IParameterBinding
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple = true, Inherited = false)]
+    public class PathAttribute : BinderBaseAttribute
     {
-		public string ValidationRegEx { get; set; }
-
 		public string NullValue { get; set; }
 
-		public string Path { get { return _path.ToString(); } set { _path = value == null ? null : new PathMapping(value); } }
-
-		private PathMapping _path;
-
-		private Type _type;
+		private IMappingBinding _requestType;
+		public string RequestType { get { return _requestType.ToString(); } set { if (_requestType != null) Mappings.Remove(_requestType); Mappings.Add(_requestType = new ContentTypeMapping(value)); } }
 
 		private delegate bool TryDeserialize(IPathStack path, out object obj);
 		private TryDeserialize _deserializer;
+
+		private string _pathResBaseName;
+		private string _pathResKey;
 
 		public PathAttribute()
 		{
@@ -30,17 +28,53 @@ namespace Calyptus.MVC
 		public PathAttribute(string preceedingPath) : this()
 		{
 			if (preceedingPath != null)
-				_path = new PathMapping(preceedingPath);
+				Path = preceedingPath;
 		}
 
-		public virtual void Initialize(ParameterInfo parameter)
+		public PathAttribute(string pathResourceBaseName, string pathResourceKey) : this()
 		{
-			_type = parameter.ParameterType;
+			_pathResBaseName = pathResourceBaseName;
+			_pathResKey = pathResourceKey;
+		}
 
-			if (typeof(IPathSerializable).IsAssignableFrom(_type))
+		public PathAttribute(string pathResourceAssembly, string pathResourceBaseName, string pathResourceKey) : this()
+		{
+			Mappings.Add(new ResourcePathMapping(Assembly.Load(pathResourceAssembly), pathResourceBaseName, pathResourceKey));
+		}
+
+		protected override void Initialize(MethodInfo method)
+		{
+			InitializeResourcePath(method.DeclaringType);
+		}
+
+		protected override void Initialize(PropertyInfo property)
+		{
+			InitializeResourcePath(property.DeclaringType);
+			InitializeDeserializer();
+		}
+
+		protected override void Initialize(ParameterInfo parameter)
+		{
+			InitializeResourcePath(parameter.Member.DeclaringType);
+			InitializeDeserializer();
+		}
+
+		private void InitializeResourcePath(Type declaringType)
+		{
+			if (Path == null && _pathResBaseName != null && _pathResKey != null)
 			{
-				MethodInfo m = _type.GetMethod("TryDeserializePath", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IPathStack), _type }, null);
-				if (m == null) throw new BindingException(String.Format("{0} is missing the static TryDeserializePath method.", _type.FullName));
+				Mappings.Add(new ResourcePathMapping(declaringType.Assembly, _pathResBaseName, _pathResKey));
+				_pathResBaseName = null;
+				_pathResKey = null;
+			}
+		}
+
+		private void InitializeDeserializer()
+		{
+			if (typeof(IPathSerializable).IsAssignableFrom(BindingTargetType))
+			{
+				MethodInfo m = BindingTargetType.GetMethod("TryDeserializePath", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(IPathStack), BindingTargetType }, null);
+				if (m == null) throw new BindingException(String.Format("{0} is missing the static TryDeserializePath method.", BindingTargetType.FullName));
 				_deserializer = delegate(IPathStack path, out object obj) {
 					object[] args = new object[] { path, null };
 					bool r = (bool) m.Invoke(null, args);
@@ -48,29 +82,30 @@ namespace Calyptus.MVC
 					return r;
 				};
 			}
-			else if (_type.IsGenericType && _type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+			else if (BindingTargetType.IsGenericType && BindingTargetType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
 			{
-				System.ComponentModel.NullableConverter converter = new System.ComponentModel.NullableConverter(_type);
-				_type = converter.UnderlyingType;
+				System.ComponentModel.NullableConverter converter = new System.ComponentModel.NullableConverter(BindingTargetType);
+				BindingTargetType = converter.UnderlyingType;
 			}
 		}
 
-		public bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
+
+		protected override bool TryBinding(IHttpContext context, IPathStack path, out object value, out int overloadWeight)
 		{
 			overloadWeight = -path.Index;
-			if ((_path == null || _path.TryMapping(context, path)) &&
-				TryBinding(path, _type, out obj))
+			if ((PathBinding == null || PathBinding.TryMapping(context, path)) &&
+				TryBinding(path, out value))
 			{
 				overloadWeight += path.Index;
-				overloadWeight *= 10;
+				overloadWeight *= 110;
 				return true;
 			}
-			obj = null;
+			value = null;
 			overloadWeight = 0;
 			return false;
 		}
 
-		protected virtual bool TryBinding(IPathStack path, Type type, out object obj)
+		private bool TryBinding(IPathStack path, out object obj)
 		{
 			if (path.IsAtEnd)
 			{
@@ -80,7 +115,7 @@ namespace Calyptus.MVC
 			else if (NullValue != null && NullValue.Equals(path.Peek(), StringComparison.CurrentCultureIgnoreCase))
 			{
 				path.Pop();
-				obj = !type.IsClass ? Activator.CreateInstance(type) : null;
+				obj = !BindingTargetType.IsClass ? Activator.CreateInstance(BindingTargetType) : null;
 				return true;
 			}
 			else if (_deserializer != null)
@@ -91,7 +126,7 @@ namespace Calyptus.MVC
 			{
 				try
 				{
-					obj = Convert.ChangeType(path.Peek(), type, System.Globalization.CultureInfo.InvariantCulture);
+					obj = Convert.ChangeType(path.Peek(), BindingTargetType, System.Globalization.CultureInfo.InvariantCulture);
 					path.Pop();
 					return true;
 				}
@@ -103,15 +138,28 @@ namespace Calyptus.MVC
 			}
 		}
 
-		public virtual void SerializePath(IPathStack path, object obj)
+		protected override bool TryBinding(IHttpContext context, out object value)
 		{
-			if (obj is IPathSerializable)
-				((IPathSerializable)obj).SerializeToPath(path);
+			value = null;
+			return false;
+		}
+
+		protected override void SerializePath(IPathStack path, object value)
+		{
+			if (value == null || value as string == "")
+			{
+				if (NullValue != null) path.Push(NullValue);
+				return;
+			}
+
+			IPathSerializable serializable = value as IPathSerializable;
+			if (serializable != null)
+				serializable.SerializeToPath(path);
 			else
 			{
 				try
 				{
-					path.Push(Convert.ToString(obj, System.Globalization.CultureInfo.InvariantCulture));
+					path.Push(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture));
 				}
 				catch (Exception e)
 				{

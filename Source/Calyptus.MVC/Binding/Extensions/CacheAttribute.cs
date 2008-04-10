@@ -24,19 +24,19 @@ namespace Calyptus.MVC
 
 		public void Initialize(MemberInfo target) { }
 
-		public void OnBeforeAction(IHttpContext context, object[] parameters) {}
-
-		public void OnAfterAction(IHttpContext context, object returnValue)
+		public void OnBeforeAction(IHttpContext context, BeforeActionEventArgs args)
 		{
 			context.Response.Cache.SetCacheability(Cacheability);
 			if (_durationSet)
 				context.Response.Cache.SetExpires(DateTime.Now.AddSeconds((double)_duration));
 		}
 
-		public bool OnError(IHttpContext context, Exception error) { return true; }
+		public void OnError(IHttpContext context, ErrorEventArgs args) { }
 
-		public void OnBeforeRender(IHttpContext context, IView view) { }
+		public void OnAfterAction(IHttpContext context, AfterActionEventArgs args) { }
 
-		public void OnAfterRender(IHttpContext context, IView view) { }
+		public void OnBeforeRender(IHttpContext context, BeforeRenderEventArgs args) { }
+
+		public void OnAfterRender(IHttpContext context, AfterRenderEventArgs args) { }
 	}
 }

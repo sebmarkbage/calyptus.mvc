@@ -44,96 +44,151 @@ namespace Calyptus.MVC
 			this.Permanent = permanently;
 		}
 
-		public void Render(IHttpContext context)
+		void IRenderable.Render(IHttpContext context)
 		{
 			base.Render(context, url);
 		}
+
+		string IView.ContentType
+		{
+			get { return "text/html"; }
+		}
+
+		void IView.Render(System.IO.Stream stream)
+		{
+			throw new NotImplementedException("Can't render a redirect to a stream.");
+		}
 	}
 
-	public class Redirect<T> : RedirectBase, IView
+	public class Redirect<TRelativeController> : RedirectBase, IView where TRelativeController : IController
 	{
 		public int Index { get; private set; }
-		public Expression<Action<T>> Action { get; private set; }
+		public Expression<Action<TRelativeController>> Action { get; private set; }
 
-		public Redirect(Expression<Action<T>> action)
+		public Redirect(Expression<Action<TRelativeController>> action)
 		{
-			Index = int.MaxValue;
+			Index = -1;
 			Action = action;
 		}
-		public Redirect(int index, Expression<Action<T>> action)
+		public Redirect(int index, Expression<Action<TRelativeController>> action)
 		{
 			Index = index;
 			Action = action;
 		}
-		public Redirect(Expression<Action<T>> action, bool permanently)
+		public Redirect(Expression<Action<TRelativeController>> action, bool permanently)
 		{
-			Index = int.MaxValue;
+			Index = -1;
 			Action = action;
 			Permanent = permanently;
 		}
-		public Redirect(int index, Expression<Action<T>> action, bool permanently)
+		public Redirect(int index, Expression<Action<TRelativeController>> action, bool permanently)
 		{
 			Index = index;
 			Action = action;
 			Permanent = permanently;
 		}
 
-		public void Render(IHttpContext context)
+		void IRenderable.Render(IHttpContext context)
 		{
-			base.Render(context, context.RoutingEngine.GetRelativePath<T>(Index, Action));
+			base.Render(context, context.Route.GetRelativePath<TRelativeController>(Index, Action));
+		}
+
+		string IView.ContentType
+		{
+			get { return "text/html"; }
+		}
+
+		void IView.Render(System.IO.Stream stream)
+		{
+			throw new NotImplementedException("Can't render a redirect to a stream.");
 		}
 	}
 
-	public class RedirectAbsolute<T> : RedirectBase, IView
-	{
-		public Expression<Action<T>> Action { get; private set; }
-
-		public RedirectAbsolute(Expression<Action<T>> action)
-		{
-			Action = action;
-		}
-		public RedirectAbsolute(Expression<Action<T>> action, bool permanently)
-		{
-			Action = action;
-			Permanent = permanently;
-		}
-		public void Render(IHttpContext context)
-		{
-			base.Render(context, context.RoutingEngine.GetAbsolutePath<T>(Action));
-		}
-	}
-
-	public class RedirectReplace<T> : RedirectBase, IView
+	public class Redirect<TRelativeController, TWithActionsFromController> : RedirectBase, IView where TRelativeController : IController where TWithActionsFromController : IController
 	{
 		public int Index { get; private set; }
-		public Expression<Action<T>> Action { get; private set; }
+		public int SecondIndex { get; private set; }
+		public Expression<Func<TRelativeController, TWithActionsFromController>> Action { get; private set; }
 
-		public RedirectReplace(Expression<Action<T>> action)
+		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
-			Index = int.MaxValue;
+			Index = -1;
 			Action = action;
 		}
-		public RedirectReplace(int index, Expression<Action<T>> action)
+		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
 			Index = index;
 			Action = action;
 		}
-		public RedirectReplace(Expression<Action<T>> action, bool permanently)
+		public Redirect(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
-			Index = int.MaxValue;
+			Index = index;
+			SecondIndex = secondIndex;
+			Action = action;
+		}
+		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
+		{
+			Index = -1;
 			Action = action;
 			Permanent = permanently;
 		}
-		public RedirectReplace(int index, Expression<Action<T>> action, bool permanently)
+		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
 		{
 			Index = index;
 			Action = action;
 			Permanent = permanently;
 		}
-		public void Render(IHttpContext context)
+		public Redirect(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
 		{
-			base.Render(context, context.RoutingEngine.GetReplacementPath<T>(Index, Action));
+			Index = index;
+			SecondIndex = secondIndex;
+			Action = action;
+			Permanent = permanently;
+		}
+
+		void IRenderable.Render(IHttpContext context)
+		{
+			base.Render(context, context.Route.GetRelativePath<TRelativeController, TWithActionsFromController>(Index, SecondIndex, Action));
+		}
+
+		string IView.ContentType
+		{
+			get { return "text/html"; }
+		}
+
+		void IView.Render(System.IO.Stream stream)
+		{
+			throw new NotImplementedException("Can't render a redirect to a stream.");
 		}
 	}
 
+	public class RedirectAbsolute<TEntryController> : RedirectBase, IView where TEntryController : class, IEntryController
+	{
+		public Expression<Action<TEntryController>> Action { get; private set; }
+
+		public RedirectAbsolute(Expression<Action<TEntryController>> action)
+		{
+			Action = action;
+		}
+		public RedirectAbsolute(Expression<Action<TEntryController>> action, bool permanently)
+		{
+			Action = action;
+			Permanent = permanently;
+		}
+
+		void IRenderable.Render(IHttpContext context)
+		{
+			base.Render(context, context.Route.GetAbsolutePath<TEntryController>(Action));
+		}
+
+		string IView.ContentType
+		{
+			get { return "text/html"; }
+		}
+
+		void IView.Render(System.IO.Stream stream)
+		{
+			throw new NotImplementedException("Can't render a redirect to a stream.");
+		}
+	}
 }

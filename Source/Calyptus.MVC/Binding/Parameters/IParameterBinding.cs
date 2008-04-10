@@ -11,5 +11,6 @@ namespace Calyptus.MVC
 		void Initialize(ParameterInfo parameter);
 		bool TryBinding(IHttpContext context, IPathStack path, out object value, out int overloadWeight);
 		void SerializePath(IPathStack path, object value);
+		void StoreBinding(IHttpContext context, object value);
 	}
 }
