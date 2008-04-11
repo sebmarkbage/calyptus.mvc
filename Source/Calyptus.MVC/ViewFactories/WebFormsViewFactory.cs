@@ -6,6 +6,7 @@ using System.Web.Compilation;
 using System.Web.UI;
 using System.Web;
 using System.Web.Hosting;
+using System.Reflection;
 
 namespace Calyptus.MVC
 {
@@ -16,15 +17,22 @@ namespace Calyptus.MVC
 			IView view = GetPageInstance(template);
 			if (view == null) return null;
 
-			/*if (view.Master != null)
+			IView v = view;
+			IViewTemplate m = GetMasterOf(template);
+			while (m != null)
 			{
-				IView master = GetMasterInstance(view.Master);
-				//if (path == null)
-				//	return null;
-				//page.MasterPageFile = path;
-			}*/
-
+				v = GetMasterInstance(m, v);
+				m = GetMasterOf(m);
+			}
 			return view;
+		}
+
+		private IViewTemplate GetMasterOf(IViewTemplate t)
+		{
+			if (t == null) return null;
+			PropertyInfo p = t.GetType().GetProperty("Master");
+			if (p == null || !typeof(IViewTemplate).IsAssignableFrom(p.PropertyType)) return null;
+			return (IViewTemplate)p.GetValue(t, null);
 		}
 
 		private VirtualPathProvider virtualPath
@@ -45,9 +53,21 @@ namespace Calyptus.MVC
 			return GetType(t, new Type[] { typeof(ViewPage<>).MakeGenericType(t), typeof(ViewControl<>).MakeGenericType(t) }, new string[] { "~/Views/{0}.aspx", "~/Views/{0}.ascx" });
 		}
 
-		private Type GetMasterType(Type t)
+		private string GetMasterType(Type t)
 		{
-			return GetType(t, typeof(ViewMaster<>).MakeGenericType(t), "~/Views/{0}.master");
+			Type ofType = typeof(ViewMaster<>).MakeGenericType(t);
+			string pattern = "~/Views/{0}.master";
+			foreach (string path in GetPaths(t))
+			{
+				string vp = String.Format(pattern, path);
+				if (virtualPath.FileExists(vp))
+				{
+					Type type = BuildManager.GetCompiledType(vp);
+					if (ofType.IsAssignableFrom(type))
+						return vp;
+				}
+			}
+			return null;
 		}
 
 		private Type GetType(Type template, Type validType, params string[] filePatterns)
@@ -133,7 +153,7 @@ namespace Calyptus.MVC
 		#region Cache
 		private Dictionary<Type, Type> _pageTypeCache;
 		private Dictionary<Type, Type> _controlTypeCache;
-		private Dictionary<Type, Type> _masterTypeCache;
+		private Dictionary<Type, string> _masterTypeCache;
 
 		protected IView GetPageInstance(IViewTemplate template)
 		{
@@ -152,7 +172,11 @@ namespace Calyptus.MVC
 			if (viewType == null)
 				return null;
 			else
-				return Create(viewType, template);
+			{
+				ViewPage p = (ViewPage)System.Activator.CreateInstance(viewType);
+				p.SetTemplate(template);
+				return p;
+			}
 		}
 
 		protected IView GetControlInstance(IViewTemplate template)
@@ -172,38 +196,60 @@ namespace Calyptus.MVC
 			if (viewType == null)
 				return null;
 			else
-				return Create(viewType, template);
+			{
+				object o = System.Activator.CreateInstance(viewType);
+				ViewPage p = o as ViewPage;
+				if (p != null)
+					p.SetTemplate(template);
+				else
+				{
+					ViewControl c = o as ViewControl;
+					if (c != null)
+						c.SetTemplate(template);
+				}
+				return (IView)o;
+			}
 		}
 
-		protected IView GetMasterInstance(IViewTemplate template)
+		protected IView GetMasterInstance(IViewTemplate template, IView parent)
 		{
 			Type templateType = template.GetType();
 
-			if (_masterTypeCache == null) _masterTypeCache = new Dictionary<Type, Type>();
+			if (_masterTypeCache == null) _masterTypeCache = new Dictionary<Type, string>();
 
-			Type viewType;
-			if (!_masterTypeCache.TryGetValue(templateType, out viewType))
+			string viewPath;
+			if (!_masterTypeCache.TryGetValue(templateType, out viewPath))
 			{
 				lock (_masterTypeCache)
 				{
-					viewType = GetMasterType(templateType);
-					_masterTypeCache.Add(templateType, viewType);
+					viewPath = GetMasterType(templateType);
+					_masterTypeCache.Add(templateType, viewPath);
 				}
 			}
-			if (viewType == null)
+			if (viewPath == null)
 				return null;
+
+			ViewMaster master;
+			ViewPage parentPage = parent as ViewPage;
+			if (parentPage != null)
+			{
+				parentPage.MasterPageFile = viewPath;
+				master = parentPage.Master;
+			}
 			else
-				return Create(viewType, template);
+			{
+				ViewMaster parentMaster = parent as ViewMaster;
+				if (parentMaster != null)
+				{
+					parentMaster.MasterPageFile = viewPath;
+					master = parentMaster.Master;
+				}
+				else
+					throw new Exception("Expected ViewMaster or ViewPage");
+			}
+			master.SetTemplate(template);
+			return master;
 		}
 		#endregion
-
-		private IView Create(Type type, IViewTemplate template)
-		{
-			Type t = typeof(IView<>).MakeGenericType(template.GetType());
-			IView v = (IView)Activator.CreateInstance(type);
-			System.Reflection.PropertyInfo p = t.GetProperty("Template");
-			p.SetValue(v, template, null);
-			return v;
-		}
 	}
 }

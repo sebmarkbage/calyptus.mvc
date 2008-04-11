@@ -4,7 +4,7 @@ using System.Net;
 using System.IO;
 
 [Controller]
-public class BlogController : IController, IDisposable
+public class BlogController : IEntryController, IDisposable
 {
 	public RootController.MasterView Master { get; set; }
 
@@ -40,7 +40,8 @@ public class BlogController : IController, IDisposable
 
 	public void Dispose()
 	{
-		_response.Close();
+		if (_response != null)
+			_response.Close();
 	}
 
 	#region View Templates

@@ -303,39 +303,35 @@ namespace Calyptus.MVC
 				if (value == null && _returnType == null) context.Response.Write("null");
 				else
 				{
-					var serializer = new DataContractJsonSerializer(value == null ? _returnType : value.GetType());
 					context.Response.Charset = context.Response.ContentEncoding.WebName;
-					var writer = JsonReaderWriterFactory.CreateJsonWriter(context.Response.OutputStream, context.Response.ContentEncoding);
-					serializer.WriteObject(writer, value);
-					writer.Close();
+					using (var writer = JsonReaderWriterFactory.CreateJsonWriter(context.Response.OutputStream, context.Response.ContentEncoding))
+					{
+						var serializer = new DataContractJsonSerializer(value == null ? _returnType : value.GetType());
+						serializer.WriteObject(writer, value);
+					}
 				}
 			}
 			else if (ResponseType == null || IsXml(ResponseType))
 			{
 				if (ResponseType == null) context.Response.ContentType = "application/xml";
 				if (value != null || _returnType != null)
-				{
-					var writer = System.Xml.XmlDictionaryWriter.Create(context.Response.Output);
-					XmlNode xmlnode = value as XmlNode;
-					if (xmlnode != null)
+					using (var writer = System.Xml.XmlWriter.Create(context.Response.Output))
 					{
-						xmlnode.WriteTo(writer);
-					}
-					else
-					{
-						XNode xnode = value as XNode;
-						if (xnode != null)
-						{
-							xnode.WriteTo(writer);
-						}
+						var xmlnode = value as XmlNode;
+						if (xmlnode != null)
+							xmlnode.WriteTo(writer);
 						else
 						{
-							var serializer = new DataContractSerializer(value == null ? _returnType : value.GetType());
-							serializer.WriteObject(writer, value);
-							writer.Close();
+							var xnode = value as XNode;
+							if (xnode != null)
+								xnode.WriteTo(writer);
+							else
+							{
+								var serializer = new DataContractSerializer(value == null ? _returnType : value.GetType());
+								serializer.WriteObject(writer, value);
+							}
 						}
 					}
-				}
 			}
 		}
 

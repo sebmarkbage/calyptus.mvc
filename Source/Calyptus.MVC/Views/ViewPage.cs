@@ -54,6 +54,11 @@ namespace Calyptus.MVC
 			}
 		}
 
+		internal virtual void SetTemplate(IViewTemplate template)
+		{
+			
+		}
+
 		public void Render(Stream stream)
 		{
 			throw new NotImplementedException();
@@ -71,6 +76,11 @@ namespace Calyptus.MVC
 		public TTemplate Data { get; set; }
 
 		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+
+		internal override void SetTemplate(IViewTemplate template)
+		{
+			Data = (TTemplate)template;
+		}
 	}
 
 	public class ViewPage<TTemplate, TMaster> : ViewPage<TTemplate>, IView<TTemplate, TMaster>

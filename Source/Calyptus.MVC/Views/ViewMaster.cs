@@ -9,6 +9,7 @@ namespace Calyptus.MVC
 {
     public abstract class ViewMaster : MasterPage, IView
     {
+
         public new ViewMaster Master { get { return (ViewMaster)base.Master; } }
 
 		public new ViewPage Page { get { return (ViewPage)base.Page; } }
@@ -45,6 +46,11 @@ namespace Calyptus.MVC
 			return Route.GetAbsolutePath<TEntryController>(action);
 		}
 
+		internal virtual void SetTemplate(IViewTemplate template)
+		{
+
+		}
+
 		string IView.ContentType
 		{
 			get { return ((IView)Page).ContentType; }
@@ -67,6 +73,11 @@ namespace Calyptus.MVC
 		public TTemplate Data { get; set; }
 
 		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+
+		internal override void SetTemplate(IViewTemplate template)
+		{
+			Data = (TTemplate)template;
+		}
 	}
 
 	public abstract class ViewMaster<TTemplate, TMaster> : ViewMaster<TTemplate>, IView<TTemplate, TMaster>

@@ -56,6 +56,10 @@ namespace Calyptus.MVC
 		{
 			throw new NotImplementedException();
 		}
+
+		internal virtual void SetTemplate(IViewTemplate template)
+		{
+		}
 	}
 
 	public class ViewControl<TTemplate> : ViewControl, IView<TTemplate> where TTemplate : class, IViewTemplate
@@ -63,5 +67,10 @@ namespace Calyptus.MVC
 		public TTemplate Data { get; set; }
 
 		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+
+		internal override void SetTemplate(IViewTemplate template)
+		{
+			Data = (TTemplate)template;
+		}
 	}
 }

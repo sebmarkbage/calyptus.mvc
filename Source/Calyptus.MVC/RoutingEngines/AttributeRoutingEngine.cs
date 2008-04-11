@@ -80,8 +80,6 @@ namespace Calyptus.MVC
 				}
 
 			_controllers = controllers.ToArray();
-
-			GC.Collect(); // Trigger garbage collection to make sure application is lean after start up
 		}
 
 		public IHttpHandler ParseRoute(IHttpContext context, IPathStack path)
