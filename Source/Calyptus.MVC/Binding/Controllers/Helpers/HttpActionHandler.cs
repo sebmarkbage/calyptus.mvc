@@ -32,7 +32,64 @@ namespace Calyptus.MVC
 		}
 	}
 
-	internal class HttpAsyncActionHandler :  IHttpAsyncHandler
+	public interface IParentActionHandler : IHttpHandler
+	{
+		bool TryBinding(IPathStack path, out IHttpHandler handler);
+	}
+
+	internal class HttpParentActionHandler : IParentActionHandler
+	{
+		public ParentActionHandler Handler;
+
+		public object Controller;
+		public object[] Arguments;
+		public IHttpContext Context;
+
+		private class RenderableHandler : IHttpHandler
+		{
+			public ParentActionHandler Handler;
+			public IHttpContext Context;
+			public object Value;
+
+			public bool IsReusable
+			{
+				get { throw new NotImplementedException(); }
+			}
+
+			public void ProcessRequest(HttpContext context)
+			{
+				Handler.RenderAction(Context, Value);
+			}
+		}
+
+		public bool TryBinding(IPathStack path, out IHttpHandler handler)
+		{
+			object value = Handler.ExecuteAction(Context, Controller, Arguments);
+			
+			if (value == null)
+			{
+				handler = null;
+				return false;
+			}
+			else if (value is IRenderable || value is IViewTemplate || (handler = Context.Route.RoutingEngine.ParseRoute(Context, path, value)) == null)
+			{
+				handler = new RenderableHandler { Context = Context, Handler = Handler, Value = value };
+			}
+			return true;
+		}
+
+		public bool IsReusable
+		{
+			get { return false; }
+		}
+
+		public void ProcessRequest(HttpContext context)
+		{
+			throw new NotImplementedException("The routing engine is suppose to parse this action before returning an IHttpHandler.");
+		}
+	}
+
+	internal class HttpAsyncActionHandler : IHttpAsyncHandler
 	{
 		public AsyncActionHandler Handler;
 
@@ -69,7 +126,7 @@ namespace Calyptus.MVC
 
 		public void ProcessRequest(HttpContext context)
 		{
-			throw new NotImplementedException();
+			EndProcessRequest(BeginProcessRequest(context, null, null));
 		}
 	}
 }

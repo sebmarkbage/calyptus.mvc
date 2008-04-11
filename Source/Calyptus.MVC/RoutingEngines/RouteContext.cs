@@ -14,6 +14,7 @@ namespace Calyptus.MVC
 			public Type ControllerType;
 		}
 		private TypePathIndex[] _boundControllers;
+		private Stack<IDisposable> _disposableControllers;
 		private int _index;
 
 		private int _pathCount;
@@ -30,6 +31,7 @@ namespace Calyptus.MVC
 			_index = 0;
 			_appPath = appPath;
 			if (!_appPath.EndsWith("/")) _appPath += "/";
+			_disposableControllers = new Stack<IDisposable>();
 		}
 
 		public void AddController(object controller, int pathIndex)
@@ -39,6 +41,9 @@ namespace Calyptus.MVC
 			if (_boundControllers == null) _boundControllers = new TypePathIndex[1];
 			if (_boundControllers.Length <= _index) Array.Resize(ref _boundControllers, _index + 1);
 			_boundControllers[_index++] = new TypePathIndex { ControllerType = controller.GetType(), PathIndex = pathIndex };
+			
+			IDisposable dc = controller as IDisposable;
+			if (dc != null && !_disposableControllers.Contains(dc)) _disposableControllers.Push(dc);
 		}
 
 		public int Index { get { return _index - 1; } }
@@ -58,7 +63,7 @@ namespace Calyptus.MVC
 				for (int i = 0; i < _boundControllers.Length; i++)
 				{
 					TypePathIndex bc = _boundControllers[i];
-					if (bc.ControllerType.IsSubclassOf(type))
+					if (type.IsAssignableFrom(bc.ControllerType))
 					{
 						if (internalIndex == index) return bc.PathIndex;
 						internalIndex++;
@@ -70,7 +75,7 @@ namespace Calyptus.MVC
 				for (int i = _boundControllers.Length - 1; i >= 0; i--)
 				{
 					TypePathIndex bc = _boundControllers[i];
-					if (bc.ControllerType.IsSubclassOf(type))
+					if (type.IsAssignableFrom(bc.ControllerType))
 					{
 						if (internalIndex == index) return bc.PathIndex;
 						internalIndex--;
@@ -138,7 +143,7 @@ namespace Calyptus.MVC
 			RoutingEngine.SerializeRelativePath(route, path);
 			if (path.Count == 0 && p.Length == 0) p.Append("./");
 
-			p.Append(path.ToString());
+			p.Append(path.GetPath(pathIndex == 0));
 
 			return p.ToString();
 		}
@@ -166,7 +171,13 @@ namespace Calyptus.MVC
 
 			RoutingEngine.SerializeAbsoutePath(route, path);
 
-			return _appPath + path.ToString();
+			return _appPath + path.GetPath(true);
+		}
+
+		public void Dispose()
+		{
+			foreach (IDisposable dc in _disposableControllers)
+				dc.Dispose();
 		}
 	}
 }

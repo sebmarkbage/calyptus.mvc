@@ -11,30 +11,43 @@ namespace Calyptus.MVC
 {
 	public abstract class ControllerBaseAttribute : Attribute, IControllerBinding
 	{
-		private PropBinding[] _properties;
-		private struct PropBinding
-		{
-			public PropertyInfo Property;
-			public IPropertyBinding Binding;
-		}
-
-		private IExtension[] _extensions;
-
 		private ActionHandler[] _handlers;
 
 		private Func<object> _controllerCreator;
 
-		// OnBeforeActionDelegate
-		// OnAfterActionDelegate
-		// OnBeforeSpecificActionDelegate[]
-		// OnAfterSpecificActionDelegate[]
-		// OnBeforeRenderDelegate
-		// OnAfterRenderDelegate
-		// DisposeDelegate
-
 		public virtual void Initialize(Type controllerType)
 		{
 			_controllerCreator = () => System.Activator.CreateInstance(controllerType);
+
+			PropertyHandler[] properties;
+			List<PropertyHandler> props = new List<PropertyHandler>();
+			foreach (PropertyInfo p in controllerType.GetProperties())
+			{
+				object[] propAttributes = p.GetCustomAttributes(typeof(IPropertyBinding), false);
+				for (int i = 0; i < propAttributes.Length; i++)
+				{
+					IPropertyBinding b = (IPropertyBinding)propAttributes[i];
+					b.Initialize(p);
+					props.Add(new PropertyHandler { Binding = b, Property = p });
+				}
+			}
+			if (props.Count > 0) properties = props.ToArray();
+			else properties = null;
+
+			IExtension[] controllerExtensions;
+			object[] exts = controllerType.GetCustomAttributes(typeof(IExtension), true);
+			if (exts.Length > 0)
+			{
+				controllerExtensions = new IExtension[exts.Length];
+				for (int i = 0; i < exts.Length; i++)
+				{
+					IExtension ext = (IExtension)exts[i];
+					ext.Initialize(controllerType);
+					controllerExtensions[i] = ext;
+				}
+			}
+			else
+				controllerExtensions = null;
 
 			List<ActionHandler> handlers = new List<ActionHandler>();
 			foreach (MethodInfo m in controllerType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
@@ -42,6 +55,21 @@ namespace Calyptus.MVC
 				object[] actionAttributes = m.GetCustomAttributes(typeof(IActionBinding), false);
 				if (actionAttributes.Length > 0)
 				{
+					IExtension[] actionExtensions;
+					exts = m.GetCustomAttributes(typeof(IExtension), true);
+					if (exts.Length > 0)
+					{
+						actionExtensions = new IExtension[exts.Length];
+						for (int i = 0; i < exts.Length; i++)
+						{
+							IExtension ext = (IExtension)exts[i];
+							ext.Initialize(m);
+							actionExtensions[i] = ext;
+						}
+					}
+					else
+						actionExtensions = null;
+
 					IActionBinding[] bs = new IActionBinding[actionAttributes.Length];
 					for (int i = 0; i < actionAttributes.Length; i++)
 					{
@@ -60,6 +88,9 @@ namespace Calyptus.MVC
 						ActionHandler handler = isAsync ? new AsyncActionHandler() : (isParentAction ? new ParentActionHandler() : new ActionHandler());
 						handler.Action = m;
 						handler.Binding = a;
+						handler.ControllerExtensions = controllerExtensions;
+						handler.ActionExtensions = actionExtensions;
+						handler.Properties = properties;
 
 						if (isAsync)
 						{
@@ -76,31 +107,6 @@ namespace Calyptus.MVC
 			}
 			if (handlers.Count > 0)
 				_handlers = handlers.ToArray();
-
-			List<PropBinding> props = new List<PropBinding>();
-			foreach (PropertyInfo p in controllerType.GetProperties())
-			{
-				object[] propAttributes = p.GetCustomAttributes(typeof(IPropertyBinding), false);
-				for (int i = 0; i < propAttributes.Length; i++)
-				{
-					IPropertyBinding b = (IPropertyBinding)propAttributes[i];
-					b.Initialize(p);
-					props.Add(new PropBinding { Binding = b, Property = p });
-				}
-			}
-			if (props.Count > 0) _properties = props.ToArray();
-
-			object[] exts = controllerType.GetCustomAttributes(typeof(IExtension), true);
-			if (exts.Length > 0)
-			{
-				_extensions = new IExtension[exts.Length];
-				for (int i = 0; i < exts.Length; i++)
-				{
-					IExtension ext = (IExtension)exts[i];
-					ext.Initialize(controllerType);
-					_extensions[i] = ext;
-				}
-			}
 		}
 
 		public virtual bool TryBinding(IHttpContext context, IPathStack path, out IHttpHandler handler)
@@ -164,48 +170,8 @@ namespace Calyptus.MVC
 
 			context.Route.AddController(controller, index); // Controller is bound, add it to the route context
 
-			if (bestHandler is ParentActionHandler)
-			{
-				object returnValue = bestHandler.ExecuteAction(context, controller, bestParameters);
-				if (returnValue == null)
-				{
-					handler = null;
-					return false;
-				}
-				IControllerBinding[] controllerBindings = returnValue is IRenderable || returnValue is IViewTemplate ? null : AttributeRoutingEngine.GetControllerBindings(returnValue.GetType());
-				if (controllerBindings == null)
-				{
-					bestHandler.RenderAction(context, returnValue);
-					context.Response.End(); // Best way to terminate response?
-					handler = null;
-					return true;
-				}
-				
-				int controllerIndex = context.Route.Index;
-				foreach (IControllerBinding binding in controllerBindings)
-				{
-					if (binding.TryBinding(context, path, returnValue, out handler))
-						return true;
-					else
-					{
-						context.Route.ReverseToIndex(controllerIndex);
-						path.ReverseToIndex(bestIndex);
-					}
-				}
-
-				handler = null;
-				return false;
-			}
-			else if (bestHandler is AsyncActionHandler)
-			{
-				handler = new HttpAsyncActionHandler { Context = context, Controller = controller, Arguments = bestParameters, Handler = (AsyncActionHandler)bestHandler };
-				return true;
-			}
-			else
-			{
-				handler = new HttpActionHandler { Context = context, Controller = controller, Arguments = bestParameters, Handler = bestHandler };
-				return true;
-			}
+			handler = bestHandler.GetHttpHandler(context, controller, bestParameters);
+			return true;
 		}
 
 		public virtual void SerializeToPath(IRouteAction action, IPathStack path)
@@ -222,21 +188,9 @@ namespace Calyptus.MVC
 					IPathStack trialStack = new PathStack(false);
 					handler.Binding.SerializePath(trialStack, action.Parameters);
 
-					IRouteAction childAction = action.ChildAction;
-					if (childAction != null)
-					{
+					if (action.ChildAction != null)
 						if (!(handler is ParentActionHandler)) throw new BindingException("Method \"{0}\" is not a parent action and can't handle further calls.");
-						IControllerBinding[] bindings = AttributeRoutingEngine.GetControllerBindings(childAction.ControllerType);
-						IPathStack bestChildStack = null;
-						foreach (IControllerBinding b in bindings)
-						{
-							IPathStack ts = new PathStack(false);
-							b.SerializeToPath(childAction, ts);
-							if (bestChildStack == null || ts.Index > bestChildStack.Index || (ts.Index == bestChildStack.Index && ts.QueryString.Count > bestChildStack.QueryString.Count))
-								bestChildStack = ts;
-						}
-						trialStack.Push(bestChildStack);
-					}
+
 					if (trialStack.Index == 0) trialStack.TrailingSlash = true;
 
 					if (bestStack == null || trialStack.Index > bestStack.Index || (trialStack.Index == bestStack.Index && trialStack.QueryString.Count > bestStack.QueryString.Count))

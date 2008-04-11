@@ -19,7 +19,7 @@ namespace Calyptus.MVC
 			_typeControllers = new Dictionary<Type, IControllerBinding[]>();
 		}
 
-		public static IControllerBinding[] GetControllerBindings(Type type)
+		private static IControllerBinding[] GetControllerBindings(Type type)
 		{
 			IControllerBinding[] bindings;
 			if (!_typeControllers.TryGetValue(type, out bindings))
@@ -67,13 +67,16 @@ namespace Calyptus.MVC
 			foreach (Assembly a in assemblies)
 				foreach (Type t in a.GetTypes())
 				{
-					IControllerBinding[] bindings = GetControllerBindings(t);
-					if (bindings != null)
-						foreach (IControllerBinding b in bindings)
-						{
-							IEntryControllerBinding eb = b as IEntryControllerBinding;
-							if (eb != null) controllers.Add(eb);
-						}
+					if (t.GetCustomAttributes(typeof(IEntryControllerBinding), false).Length > 0)
+					{
+						IControllerBinding[] bindings = GetControllerBindings(t);
+						if (bindings != null)
+							foreach (IControllerBinding b in bindings)
+							{
+								IEntryControllerBinding eb = b as IEntryControllerBinding;
+								if (eb != null) controllers.Add(eb);
+							}
+					}
 				}
 
 			_controllers = controllers.ToArray();
@@ -93,6 +96,9 @@ namespace Calyptus.MVC
 				context.Route.ReverseToIndex(-1);
 				if (c.TryBinding(context, path, out handler))
 				{
+					while (handler is IParentActionHandler)
+						if (!(handler as IParentActionHandler).TryBinding(path, out handler))
+							return null;
 					return handler;
 				}
 				else
@@ -100,6 +106,28 @@ namespace Calyptus.MVC
 			}
 			return null;
         }
+
+		public IHttpHandler ParseRoute(IHttpContext context, IPathStack path, object controller)
+		{
+			IControllerBinding[] bindings = GetControllerBindings(controller.GetType());
+			if (bindings != null)
+			{
+				int index = path.Index;
+				int controllerIndex = context.Route.Index;
+				foreach (IControllerBinding binding in bindings)
+				{
+					IHttpHandler handler;
+					if (binding.TryBinding(context, path, controller, out handler))
+						return handler;
+					else
+					{
+						context.Route.ReverseToIndex(controllerIndex);
+						path.ReverseToIndex(index);
+					}
+				}
+			}
+			return null;
+		}
 
 		public void SerializeAbsoutePath(IRouteAction action, IPathStack path)
 		{
@@ -121,6 +149,13 @@ namespace Calyptus.MVC
 				{
 					IPathStack trialStack = new PathStack(false);
 					b.SerializeToPath(action, trialStack);
+
+					IRouteAction childAction = action.ChildAction;
+					if (childAction != null)
+					{
+						SerializePath(childAction, trialStack, false);
+					}
+
 					if (bestStack == null || trialStack.Index > bestStack.Index || (trialStack.Index == bestStack.Index && trialStack.QueryString.Count > bestStack.QueryString.Count))
 						bestStack = trialStack;
 				}

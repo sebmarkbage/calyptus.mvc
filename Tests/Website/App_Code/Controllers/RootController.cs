@@ -11,6 +11,13 @@ public class RootController : IEntryController
 		return new DefaultView { Title = "Test INDEX" };
 	}
 
+	[Path("Circular")]
+	public RootController Circular()
+	{
+		return this;
+	}
+
+
 	[Path("TestObject"), Path("TestObjectJson", ResponseType="application/json")]
 	public object GetTestObject()
 	{

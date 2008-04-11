@@ -20,10 +20,12 @@ namespace Calyptus.MVC
 
 		public int Count { get { return _path.Length; } }
 
-        internal PathStack(bool readOnly) : this(null, null, readOnly) { }
+        internal PathStack(bool readOnly) : this(null, null, null, readOnly) { }
 
-        internal PathStack(string path, NameValueCollection query, bool readOnly)
+        internal PathStack(string verb, string path, NameValueCollection query, bool readOnly)
         {
+			_verb = verb;
+
 			QueryString = query ?? new NameValueCollection();
 
 			if (path == null)
@@ -58,11 +60,25 @@ namespace Calyptus.MVC
 
 		public override string ToString()
 		{
+			return GetPath(true);
+		}
+
+		public string GetPath(bool rooted)
+		{
 			StringBuilder sb = new StringBuilder();
 			foreach (string path in _path)
 			{
-				if (sb.Length > 0) sb.Append('/');
-				sb.Append(Encode(path));
+				if (sb.Length > 0)
+				{
+					sb.Append('/'); ;
+					sb.Append(Encode(path));
+				}
+				else
+				{
+					sb.Append(Encode(path));
+					if (rooted)
+						sb.Append(Configuration.Config.GetExtension());
+				}
 			}
 			if (TrailingSlash) sb.Append('/');
 
@@ -187,9 +203,6 @@ namespace Calyptus.MVC
 			if (string.IsNullOrEmpty(path))
 				throw new InvalidOperationException("The PathStack cannot Push null or empty strings.");
 
-			if (_currentIndex == -1)
-				path += Configuration.Config.GetExtension();
-
 			if (_path.Length <= _currentIndex)
 			{
 				Array.Resize(ref _path, _currentIndex + 1);
@@ -215,6 +228,22 @@ namespace Calyptus.MVC
 			path.ReverseToIndex(index);
 
 			QueryString.Add(path.QueryString);
+		}
+
+		private string _verb;
+
+		public string Verb
+		{
+			get
+			{
+				return _verb;
+			}
+			set
+			{
+				if (_readOnly)
+					throw new InvalidOperationException("This PathStack is read only.");
+				_verb = value;
+			}
 		}
 	}
 }

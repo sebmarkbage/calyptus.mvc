@@ -24,6 +24,8 @@ namespace Calyptus.MVC
 		void Push(string path);
 		void Push(IPathStack stack);
 
+		string Verb { get; set; }
+
 		bool TrailingSlash { get; set; }
 	}
 }

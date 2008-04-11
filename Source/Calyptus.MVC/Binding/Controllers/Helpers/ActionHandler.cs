@@ -2,22 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Calyptus.MVC
 {
+	internal class PropertyHandler
+	{
+		public IPropertyBinding Binding;
+		public System.Reflection.PropertyInfo Property;
+	}
+
 	internal class ActionHandler
 	{
 		public IActionBinding Binding;
-		public event Action<IHttpContext, BeforeActionEventArgs> BeforeAction;
-		public event Action<IHttpContext, AfterActionEventArgs> AfterAction;
-		public event Action<IHttpContext, BeforeRenderEventArgs> BeforeRender;
-		public event Action<IHttpContext, AfterRenderEventArgs> AfterRender;
-		public event Action<IHttpContext, ErrorEventArgs> Error;
+		public IExtension[] ControllerExtensions;
+		public IExtension[] ActionExtensions;
+		public PropertyHandler[] Properties;
+
+		/*public Action<IHttpContext, BeforeActionEventArgs> ControllerBeforeAction;
+		public Action<IHttpContext, BeforeActionEventArgs> ControllerAfterAction;
+		public Action<IHttpContext, BeforeActionEventArgs> ActionBeforeAction;
+		public Action<IHttpContext, BeforeActionEventArgs> ActionAfterAction;
+		public Action<IHttpContext, BeforeActionEventArgs> ControllerBeforeRender;
+		public Action<IHttpContext, BeforeActionEventArgs> ControllerAfterRender;
+		public Action<IHttpContext, BeforeActionEventArgs> ControllerBeforeRender;
+		public Action<IHttpContext, BeforeActionEventArgs> ControllerAfterRender;*/
+
+		//public Func<object, object[], object> Action;
+		public System.Reflection.MethodInfo Action;
 
 		protected void OnBeforeAction(IHttpContext context, BeforeActionEventArgs args)
 		{
-			if (BeforeAction != null)
-				BeforeAction(context, args);
+			if (ControllerExtensions != null)
+				foreach(IExtension ext in ControllerExtensions)
+					ext.OnBeforeAction(context, args);
+
+			if (ActionExtensions != null)
+				foreach(IExtension ext in ActionExtensions)
+					ext.OnBeforeAction(context, args);
+
+			if (Properties != null)
+				foreach (PropertyHandler prop in Properties)
+				{
+					object v;
+					if (prop.Binding.TryBinding(context, out v))
+						prop.Property.SetValue(args.Controller, v, null);
+				}
 
 			Binding.OnBeforeAction(context, args);
 		}
@@ -25,28 +55,46 @@ namespace Calyptus.MVC
 		{
 			Binding.OnAfterAction(context, args);
 
-			if (AfterAction != null)
-				AfterAction(context, args);
+			if (Properties != null)
+				foreach (PropertyHandler prop in Properties)
+					prop.Binding.StoreBinding(context, prop.Property.GetValue(args.Controller, null));
+
+			if (ActionExtensions != null)
+				foreach(IExtension ext in ActionExtensions)
+					ext.OnAfterAction(context, args);
+
+			if (ControllerExtensions != null)
+				foreach(IExtension ext in ControllerExtensions)
+					ext.OnAfterAction(context, args);
 		}
 		protected void OnBeforeRender(IHttpContext context, BeforeRenderEventArgs args)
 		{
-			if (BeforeRender != null)
-				BeforeRender(context, args);
+			if (ControllerExtensions != null)
+				foreach (IExtension ext in ControllerExtensions)
+					ext.OnBeforeRender(context, args);
+			if (ActionExtensions != null)
+				foreach (IExtension ext in ActionExtensions)
+					ext.OnBeforeRender(context, args);
 		}
 		protected void OnAfterRender(IHttpContext context, AfterRenderEventArgs args)
 		{
-			if (AfterRender != null)
-				AfterRender(context, args);
+			if (ActionExtensions != null)
+				foreach (IExtension ext in ActionExtensions)
+					ext.OnAfterRender(context, args);
+			if (ControllerExtensions != null)
+				foreach (IExtension ext in ControllerExtensions)
+					ext.OnAfterRender(context, args);
 		}
 		protected void OnError(IHttpContext context, ErrorEventArgs args)
 		{
-			if (Error != null)
-				Error(context, args);
+			if (ActionExtensions != null)
+				foreach (IExtension ext in ActionExtensions)
+					ext.OnError(context, args);
+			if (ControllerExtensions != null)
+				foreach (IExtension ext in ControllerExtensions)
+					ext.OnError(context, args);
 		}
 
-		//public Func<object, object[], object> Action;
-		public System.Reflection.MethodInfo Action;
-		
 		public virtual object ExecuteAction(IHttpContext context, object controller, object[] parameters)
 		{
 			object returnValue;
@@ -162,11 +210,19 @@ namespace Calyptus.MVC
 					return null;
 			}
 		}
+
+		public virtual IHttpHandler GetHttpHandler(IHttpContext context, object controller, object[] parameters)
+		{
+			return new HttpActionHandler { Controller = controller, Arguments = parameters, Context = context, Handler = this };
+		}
 	}
 
 	internal class ParentActionHandler : ActionHandler
 	{
-
+		public override IHttpHandler GetHttpHandler(IHttpContext context, object controller, object[] parameters)
+		{
+			return new HttpParentActionHandler { Controller = controller, Arguments = parameters, Context = context, Handler = this };
+		}
 	}
 
 	internal class AsyncActionHandler : ActionHandler
@@ -210,5 +266,11 @@ namespace Calyptus.MVC
 			}
 			return returnValue;
 		}
+
+		public override IHttpHandler GetHttpHandler(IHttpContext context, object controller, object[] parameters)
+		{
+			return new HttpAsyncActionHandler { Controller = controller, Arguments = parameters, Context = context, Handler = this };
+		}
+
 	}
 }

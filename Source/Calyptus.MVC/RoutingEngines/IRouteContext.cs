@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Calyptus.MVC
 {
-	public interface IRouteContext
+	public interface IRouteContext : IDisposable
 	{
 		IRoutingEngine RoutingEngine { get; }
 

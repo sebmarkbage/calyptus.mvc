@@ -45,11 +45,16 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Binding\Actions\ActionAttribute.cs" />
     <Compile Include="Binding\Actions\ActionBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
+    <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
+    <Compile Include="Binding\Attributes\RequestAttribute.cs" />
     <Compile Include="Binding\Attributes\DefaultAttribute.cs" />
     <Compile Include="Binding\Attributes\BinderBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\DeleteAttribute.cs" />

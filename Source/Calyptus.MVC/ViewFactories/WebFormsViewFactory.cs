@@ -66,7 +66,7 @@ namespace Calyptus.MVC
 					{
 						Type type = BuildManager.GetCompiledType(vp);
 						foreach(Type ofType in validTypes)
-							if (type.IsSubclassOf(ofType))
+							if (ofType.IsAssignableFrom(type))
 								return type;
 					}
 				}

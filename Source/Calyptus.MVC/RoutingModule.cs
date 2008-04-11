@@ -20,6 +20,7 @@ namespace Calyptus.MVC
         public void Init(HttpApplication app)
         {
 			app.PostResolveRequestCache += new EventHandler(Route);
+			app.EndRequest += new EventHandler(CleanUp);
         }
 
         void Route(object s, EventArgs e)
@@ -39,18 +40,32 @@ namespace Calyptus.MVC
 
 			string path = ((l <= 0 ? null : request.AppRelativeCurrentExecutionFilePath.Substring(2, l)) + request.PathInfo);
 
-            PathStack stack = new PathStack(path, context.Request.QueryString, true);
+            PathStack stack = new PathStack(request.HttpMethod, path, context.Request.QueryString, true);
 
 			IRoutingEngine routing = Config.GetRoutingEngine();
 			IViewFactory viewFactory = Config.GetViewFactory();
+			IRouteContext route = new RouteContext(routing, request.ApplicationPath, stack.Count, stack.TrailingSlash);
 
-			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, new RouteContext(routing, request.ApplicationPath, stack.Count, stack.TrailingSlash), viewFactory), stack);
+			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, route, viewFactory), stack);
 			if (handler != null)
 			{
-				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path };
+				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path, Route = route };
 				context.RewritePath("~/Calyptus.MVC.axd");
 			}
+			else
+				route.Dispose();
         }
+
+		void CleanUp(object s, EventArgs e)
+		{
+			HttpContext context = ((HttpApplication)s).Context;
+			RequestData data = (RequestData)context.Items[_requestDataKey];
+			if (data != null)
+			{
+				data.Route.Dispose();
+				context.Items.Remove(_requestDataKey);
+			}
+		}
 
         public void Dispose()
         {
@@ -61,7 +76,6 @@ namespace Calyptus.MVC
 			RequestData data = (RequestData) context.Items[_requestDataKey];
 			if (data != null)
 			{
-				context.Items.Remove(_requestDataKey);
 				context.RewritePath(data.OriginalPath);
 				return data.Handler;
 			}
@@ -73,6 +87,7 @@ namespace Calyptus.MVC
 		{
 			public string OriginalPath;
 			public IHttpHandler Handler;
+			public IRouteContext Route;
 		}
     }
 }

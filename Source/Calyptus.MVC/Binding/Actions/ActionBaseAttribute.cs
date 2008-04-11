@@ -10,6 +10,8 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Xml.Linq;
+using System.Xml;
 
 namespace Calyptus.MVC
 {
@@ -29,7 +31,6 @@ namespace Calyptus.MVC
 		//protected bool[] IsOutBindings;
 		//protected IBindingConstraint[][] Constraints;
 		protected ParamBindings[] Bindings;
-		protected IExtension[] Extensions;
 
 		public virtual string ResponseType { get; set; }
 
@@ -120,17 +121,6 @@ namespace Calyptus.MVC
 				};
 			}
 
-			object[] exts = method.GetCustomAttributes(typeof(IExtension), true);
-			if (exts.Length > 0)
-			{
-				Extensions = new IExtension[exts.Length];
-				for (int i = 0; i < exts.Length; i++)
-				{
-					IExtension ext = (IExtension)exts[i];
-					ext.Initialize(method);
-					Extensions[i] = ext;
-				}
-			}
 			Initialize(method);
 		}
 
@@ -325,10 +315,26 @@ namespace Calyptus.MVC
 				if (ResponseType == null) context.Response.ContentType = "application/xml";
 				if (value != null || _returnType != null)
 				{
-					var serializer = new DataContractSerializer(value == null ? _returnType : value.GetType());
 					var writer = System.Xml.XmlDictionaryWriter.Create(context.Response.Output);
-					serializer.WriteObject(writer, value);
-					writer.Close();
+					XmlNode xmlnode = value as XmlNode;
+					if (xmlnode != null)
+					{
+						xmlnode.WriteTo(writer);
+					}
+					else
+					{
+						XNode xnode = value as XNode;
+						if (xnode != null)
+						{
+							xnode.WriteTo(writer);
+						}
+						else
+						{
+							var serializer = new DataContractSerializer(value == null ? _returnType : value.GetType());
+							serializer.WriteObject(writer, value);
+							writer.Close();
+						}
+					}
 				}
 			}
 		}
