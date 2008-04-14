@@ -53,6 +53,7 @@
     <Compile Include="Binding\Actions\ActionAttribute.cs" />
     <Compile Include="Binding\Actions\ActionBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
+    <Compile Include="Binding\Attributes\ApplicationPathAttribute.cs" />
     <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
     <Compile Include="Binding\Attributes\RequestAttribute.cs" />
     <Compile Include="Binding\Attributes\DefaultAttribute.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="Binding\Actions\IActionBinding.cs" />
     <Compile Include="Binding\Controllers\IEntryControllerBinding.cs" />
     <Compile Include="Binding\Mapping\PathMapping.cs" />
-    <Compile Include="Binding\Parameters\ParamAttribute.cs" />
     <Compile Include="Binding\Parameters\IParameterBinding.cs" />
     <Compile Include="Binding\Attributes\PostAttribute.cs" />
     <Compile Include="Binding\Attributes\SessionAttribute.cs" />

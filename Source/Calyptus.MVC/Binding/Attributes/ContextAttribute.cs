@@ -7,6 +7,7 @@ using System.Web.SessionState;
 using System.Web.Caching;
 using System.IO;
 using System.Xml;
+using System.Web.Profile;
 
 namespace Calyptus.MVC
 {
@@ -56,6 +57,7 @@ namespace Calyptus.MVC
 			else if (type == typeof(HttpApplicationState)) return c => c.Application;
 			else if (type == typeof(HttpApplication)) return c => c.ApplicationInstance;
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
+			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;
 			else if (type == typeof(IIdentity)) return c => c.User.Identity;
 			else if (type == typeof(IHttpContext)) return c => c;

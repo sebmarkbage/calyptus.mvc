@@ -27,14 +27,11 @@ namespace Calyptus.MVC
 			public bool IsOut;
 		}
 
-		//protected IParameterBinding[][] Bindings;
-		//protected bool[] IsOutBindings;
-		//protected IBindingConstraint[][] Constraints;
 		protected ParamBindings[] Bindings;
 
 		public virtual string ResponseType { get; set; }
 
-		protected virtual Type DefaultParameterBinderType { get { return typeof(ParamAttribute); } }
+		protected virtual Type DefaultParameterBinderType { get { return typeof(GetAttribute); } }
 
 		public ActionBaseAttribute() : this(null) { }
 

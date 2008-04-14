@@ -8,10 +8,6 @@ using System.Reflection;
 
 namespace Calyptus.MVC
 {
-	// AsyncEndDelegate
-	// OnBeforeActionDelegate
-	// OnAfterActionDelegate
-
 	internal class HttpActionHandler : IHttpHandler, IRequiresSessionState
 	{
 		public ActionHandler Handler;
@@ -71,9 +67,13 @@ namespace Calyptus.MVC
 				handler = null;
 				return false;
 			}
-			else if (value is IRenderable || value is IViewTemplate || (handler = Context.Route.RoutingEngine.ParseRoute(Context, path, value)) == null)
+			else if (value is IRenderable || value is IViewTemplate)
 			{
 				handler = new RenderableHandler { Context = Context, Handler = Handler, Value = value };
+			}
+			else if ((handler = Context.Route.RoutingEngine.ParseRoute(Context, path, value)) == null)
+			{
+				return false;
 			}
 			return true;
 		}

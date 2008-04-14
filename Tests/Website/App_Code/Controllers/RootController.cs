@@ -2,6 +2,7 @@
 using Calyptus.MVC;
 using System.Security.Principal;
 using System.Runtime.Serialization;
+using System.Linq;
 
 [EntryController]
 public class RootController : IEntryController
@@ -17,7 +18,6 @@ public class RootController : IEntryController
 	{
 		return this;
 	}
-
 
 	[Path("TestObject"), Path("TestObjectJson", ResponseType="application/json")]
 	public object GetTestObject()
@@ -41,7 +41,6 @@ public class RootController : IEntryController
 		[NonSerialized]
 		public int ID;
 		public string Title;
-		[System.Xml.Serialization.XmlArray(ElementName="test")]
 		public TestObject[] Children;
 	}
 

@@ -12,7 +12,7 @@ namespace Calyptus.MVC
 		{
 			get
 			{
-				return typeof(ParamAttribute);
+				return typeof(GetAttribute);
 			}
 		}
 

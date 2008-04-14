@@ -14,6 +14,14 @@ namespace Calyptus.MVC
 		protected IMappingBinding PathBinding;
 		public string Path { get { return PathBinding == null ? null : PathBinding.ToString(); } set { if (PathBinding != null) Mappings.Remove(PathBinding); Mappings.Add(PathBinding = new PathMapping(value)); } }
 
+		public object DefaultValue { get; set; }
+
+		protected bool AcceptOut { get; set; }
+		protected bool AcceptRef { get; set; }
+
+		protected bool IsOut { get; private set; }
+		protected bool IsRef { get; private set; }
+
 		protected override Type DefaultParameterBinderType
 		{
 			get
@@ -24,6 +32,7 @@ namespace Calyptus.MVC
 
 		void IParameterBinding.Initialize(ParameterInfo parameter)
 		{
+
 			BindingTargetType = parameter.ParameterType;
 			Initialize(parameter);
 		}
@@ -73,6 +82,11 @@ namespace Calyptus.MVC
 		{
 			bool r = TryBinding(context, out value);
 			overloadWeight = r ? 100 : 0;
+			if (!r && DefaultValue != null)
+			{
+				value = DefaultValue;
+				return true;
+			}
 			return r;
 		}
 

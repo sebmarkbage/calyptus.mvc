@@ -21,23 +21,19 @@ namespace Calyptus.MVC
 		private string _pathResBaseName;
 		private string _pathResKey;
 
-		public PathAttribute()
-		{
-		}
-
-		public PathAttribute(string preceedingPath) : this()
+		public PathAttribute(string preceedingPath)
 		{
 			if (preceedingPath != null)
 				Path = preceedingPath;
 		}
 
-		public PathAttribute(string pathResourceBaseName, string pathResourceKey) : this()
+		public PathAttribute(string pathResourceBaseName, string pathResourceKey)
 		{
 			_pathResBaseName = pathResourceBaseName;
 			_pathResKey = pathResourceKey;
 		}
 
-		public PathAttribute(string pathResourceAssembly, string pathResourceBaseName, string pathResourceKey) : this()
+		public PathAttribute(string pathResourceAssembly, string pathResourceBaseName, string pathResourceKey)
 		{
 			Mappings.Add(new ResourcePathMapping(Assembly.Load(pathResourceAssembly), pathResourceBaseName, pathResourceKey));
 		}
@@ -115,7 +111,7 @@ namespace Calyptus.MVC
 			else if (NullValue != null && NullValue.Equals(path.Peek(), StringComparison.CurrentCultureIgnoreCase))
 			{
 				path.Pop();
-				obj = !BindingTargetType.IsClass ? Activator.CreateInstance(BindingTargetType) : null;
+				obj = !BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null;
 				return true;
 			}
 			else if (_deserializer != null)
