@@ -7,10 +7,13 @@ using System.Linq;
 [EntryController]
 public class RootController : IEntryController
 {
+	[ApplicationPath]
+	public string Path { get; set; }
+
 	[Default, Path("TrailTest")]
 	public IViewTemplate Index()
 	{
-		return new DefaultView { Title = "Test INDEX" };
+		return new DefaultView { Title = Path };
 	}
 
 	// bla...

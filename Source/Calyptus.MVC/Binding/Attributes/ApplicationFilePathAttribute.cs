@@ -11,7 +11,7 @@ using System.Xml;
 namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-	public class ApplicationPathAttribute : Attribute, IPropertyBinding, IParameterBinding
+	public class ApplicationFilePathAttribute : Attribute, IPropertyBinding, IParameterBinding
 	{
 		private Func<IHttpContext, object> binder;
 
@@ -41,7 +41,8 @@ namespace Calyptus.MVC
 
 		private static Func<IHttpContext, object> GetBinder(Type type)
 		{
-			if (type == typeof(string)) return c => c.Request.ApplicationPath;
+			if (type == typeof(string)) return c => c.Server.MapPath("~/");
+			else if (type == typeof(DirectoryInfo)) return c => new DirectoryInfo(c.Server.MapPath("~/"));
 			else return null;
 		}
 

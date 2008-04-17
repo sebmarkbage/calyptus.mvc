@@ -84,7 +84,18 @@ namespace Calyptus.MVC
 		protected virtual bool TryBinding(IHttpContext context, IPathStack path, out object value, out int overloadWeight)
 		{
 			bool r = TryBinding(context, out value);
-			overloadWeight = r ? 100 : 0;
+
+			if (!r) overloadWeight = 0;
+			else if (value == null) overloadWeight = 50;
+			else if (value.GetType() == typeof(string)) overloadWeight = 85;
+			else if (value.GetType() == typeof(char[])) overloadWeight = 85;
+			else if (value.GetType() == typeof(char)) overloadWeight = 86;
+			else if (value.GetType() == typeof(bool)) overloadWeight = 92;
+			else if (value.GetType() == typeof(int)) overloadWeight = 93;
+			else if (value.GetType() == typeof(float)) overloadWeight = 94;
+			else if (value.GetType() == typeof(double)) overloadWeight = 95;
+			else overloadWeight = 100;
+
 			if (!r && DefaultValue != null)
 			{
 				value = DefaultValue;

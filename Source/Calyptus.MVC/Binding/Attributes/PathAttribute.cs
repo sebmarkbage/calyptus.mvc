@@ -101,8 +101,21 @@ namespace Calyptus.MVC
 			if ((PathBinding == null || PathBinding.TryMapping(context, path)) &&
 				TryBinding(path, out value))
 			{
-				overloadWeight += path.Index;
-				overloadWeight *= 110;
+				if (value == null)
+					overloadWeight = 50;
+				else if (value.GetType() == typeof(string)) overloadWeight = 100;
+				else if (value.GetType() == typeof(char[])) overloadWeight = 100;
+				else if (value.GetType() == typeof(char)) overloadWeight = 101;
+				else if (value.GetType() == typeof(bool)) overloadWeight = 107;
+				else if (value.GetType() == typeof(int)) overloadWeight = 108;
+				else if (value.GetType() == typeof(float)) overloadWeight = 109;
+				else if (value.GetType() == typeof(double)) overloadWeight = 110;
+				else if (value.GetType() == typeof(DateTime)) overloadWeight = 115;
+				else
+				{
+					overloadWeight += path.Index;
+					overloadWeight *= 110;
+				}
 				return true;
 			}
 			value = null;
@@ -123,7 +136,7 @@ namespace Calyptus.MVC
 				obj = _emptyValueSet ? _emptyValue : (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null));
 				return true;
 			}
-			path.ReverseToIndex(0);
+			path.ReverseToIndex(index);
 			if (_deserializer != null)
 			{
 				return _deserializer(path, out obj);

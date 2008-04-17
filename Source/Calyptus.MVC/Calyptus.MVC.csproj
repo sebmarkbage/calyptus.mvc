@@ -54,6 +54,7 @@
     <Compile Include="Binding\Actions\ActionBaseAttribute.cs" />
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
     <Compile Include="Binding\Attributes\ApplicationPathAttribute.cs" />
+    <Compile Include="Binding\Attributes\ApplicationFilePathAttribute.cs" />
     <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
     <Compile Include="Binding\Attributes\RequestAttribute.cs" />
     <Compile Include="Binding\Attributes\DefaultAttribute.cs" />

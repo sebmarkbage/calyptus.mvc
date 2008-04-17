@@ -169,6 +169,7 @@ namespace Calyptus.MVC
 									if (!constraint.TryConstraint(context, obj))
 									{
 										constrained = true;
+										path.ReverseToIndex(index);
 										break;
 									}
 							if (!constrained)
