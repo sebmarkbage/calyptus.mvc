@@ -8,6 +8,7 @@ using Calyptus.MVC.Configuration;
 using System.Web.Configuration;
 using System.Configuration;
 using System.Collections;
+using System.IO;
 
 namespace Calyptus.MVC
 {
@@ -23,10 +24,34 @@ namespace Calyptus.MVC
 			app.EndRequest += new EventHandler(CleanUp);
         }
 
+		private static string[] _ignorePaths;
+
+		private bool IgnorePath(HttpRequest request)
+		{
+			if (_ignorePaths == null)
+			{
+				DirectoryInfo dir = new DirectoryInfo(request.MapPath("~/"));
+				List<string> paths = new List<string>();
+				foreach (FileInfo file in dir.GetFiles())
+					if (file.Name != "web.config" && file.Name != "default.aspx")
+						paths.Add(file.Name);
+				foreach (DirectoryInfo d in dir.GetDirectories())
+					if (d.Name != "App_Data" && d.Name != "App_Code")
+						paths.Add(d.Name);
+				_ignorePaths = paths.ToArray();
+			}
+			string p = request.AppRelativeCurrentExecutionFilePath;
+			int i = p.IndexOf('/', 2);
+			p = i < 0 ? p.Substring(2) : p.Substring(2, i - 2);
+			return _ignorePaths.Contains(p, StringComparer.InvariantCultureIgnoreCase);
+		}
+
         void Route(object s, EventArgs e)
         {
             HttpContext context = ((HttpApplication)s).Context;
             HttpRequest request = context.Request;
+
+			if (IgnorePath(request)) return;
 
 			string appRelPath = request.AppRelativeCurrentExecutionFilePath;
 
