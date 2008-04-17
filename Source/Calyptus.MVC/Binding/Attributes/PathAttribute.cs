@@ -10,7 +10,12 @@ namespace Calyptus.MVC
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple = true, Inherited = false)]
     public class PathAttribute : BinderBaseAttribute
     {
-		public string NullValue { get; set; }
+		private IMappingBinding _emptyPath;
+		public string EmptyPath { get { return _emptyPath == null ? null : _emptyPath.ToString(); } set { _emptyPath = new PathMapping(value); } }
+
+		private bool _emptyValueSet;
+		private object _emptyValue;
+		public object EmptyValue { get { return _emptyValue; } set { _emptyValue = value; _emptyValueSet = true; } }
 
 		private IMappingBinding _requestType;
 		public string RequestType { get { return _requestType.ToString(); } set { if (_requestType != null) Mappings.Remove(_requestType); Mappings.Add(_requestType = new ContentTypeMapping(value)); } }
@@ -20,6 +25,10 @@ namespace Calyptus.MVC
 
 		private string _pathResBaseName;
 		private string _pathResKey;
+
+		public PathAttribute()
+		{
+		}
 
 		public PathAttribute(string preceedingPath)
 		{
@@ -108,13 +117,14 @@ namespace Calyptus.MVC
 				obj = null;
 				return false;
 			}
-			else if (NullValue != null && NullValue.Equals(path.Peek(), StringComparison.CurrentCultureIgnoreCase))
+			int index = path.Index;
+			if (_emptyPath != null && _emptyPath.TryMapping(null, path))
 			{
-				path.Pop();
-				obj = !BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null;
+				obj = _emptyValueSet ? _emptyValue : (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null));
 				return true;
 			}
-			else if (_deserializer != null)
+			path.ReverseToIndex(0);
+			if (_deserializer != null)
 			{
 				return _deserializer(path, out obj);
 			}
@@ -142,9 +152,9 @@ namespace Calyptus.MVC
 
 		protected override void SerializePath(IPathStack path, object value)
 		{
-			if (value == null || value as string == "")
+			if (value == null || value as string == "" || value == DefaultValue)
 			{
-				if (NullValue != null) path.Push(NullValue);
+				_emptyPath.SerializeToPath(path);
 				return;
 			}
 

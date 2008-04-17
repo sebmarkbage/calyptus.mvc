@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Calyptus.MVC
 {
@@ -91,7 +92,7 @@ namespace Calyptus.MVC
 			if (expression.Body.NodeType != ExpressionType.Call) throw new BindingException("Invalid lambda expression. Cannot serialize.");
 
 			RouteAction action = null;
-			var type = expression.Parameters[0].Type;
+			//var type = expression.Parameters[0].Type;
 			var call = expression.Body as MethodCallExpression;
 			while (call != null)
 			{
@@ -106,12 +107,40 @@ namespace Calyptus.MVC
 					i++;
 				}
 				// TODO: controller type casting
-				if (action != null) action.ControllerType = call.Type;
-				action = new RouteAction(type, call.Method, parameters, action);
-	
-				if (!(call.Object is MethodCallExpression) && call.Object != expression.Parameters[0]) throw new BindingException(String.Format("The first controller must be the first parameter of the lambda ({0}).", expression.Parameters[0].Name));
+				//if (action != null) action.ControllerType = call.Type;
+				MethodInfo method = call.Method;
+				Type type;
+				MethodCallExpression methodExp = call.Object as MethodCallExpression;
+				if (methodExp != null)
+				{
+					type = methodExp.Type;
+					call = methodExp;
+				}
+				else if (call.Object.NodeType == ExpressionType.TypeAs || call.Object.NodeType == ExpressionType.Convert || call.Object.NodeType == ExpressionType.ConvertChecked)
+				{
+					UnaryExpression cast = call.Object as UnaryExpression;
+					call = cast.Operand as MethodCallExpression;
+					type = cast.Type;
+					if (call == null)
+					{
+						ParameterExpression firstParam = call.Object as ParameterExpression;
+						if (firstParam == null || firstParam != expression.Parameters[0])
+							throw new BindingException(String.Format("Only the first parameter of the lambda, casts and method call may be used. The first controller must be the first parameter of the lambda ({0}).", expression.Parameters[0].Name));
+					}
+				}
+				else
+				{
+					ParameterExpression firstParam = call.Object as ParameterExpression;
+					if (firstParam != null && firstParam == expression.Parameters[0])
+					{
+						call = null;
+						type = firstParam.Type;
+					}
+					else
+						throw new BindingException(String.Format("Only the first parameter of the lambda, casts and method call may be used. The first controller must be the first parameter of the lambda ({0}).", expression.Parameters[0].Name));
+				}				
 
-				call = call.Object as MethodCallExpression;
+				action = new RouteAction(type, method, parameters, action);
 			}
 			return action;
 		}

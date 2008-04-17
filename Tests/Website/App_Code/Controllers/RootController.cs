@@ -13,6 +13,26 @@ public class RootController : IEntryController
 		return new DefaultView { Title = "Test INDEX" };
 	}
 
+	// bla...
+	// { ID: 5, Name: 'Name' }
+	// { obj: { ID: 5, Name: 'Name' }, id: 123 }
+
+	// <root>
+	//   <obj>
+	//     <id>10</id>
+	//   </obj>
+	//   <id>10</id>
+	// </root>
+
+	// obj.id=10&obj.name=Name
+	// 
+
+	[Post]
+	public void Save([Form] TestObject obj, [Get] int id)
+	{
+
+	}
+
 	[Path("Circular")]
 	public RootController Circular()
 	{
@@ -58,7 +78,7 @@ public class RootController : IEntryController
 	// { id: 10, name: "Name" }
 
 	[Get, Post(Path = "Save")]
-	public void Save([Get] int id, out int id2, ref int id3)
+	public void Save([Path(DefaultValue=-1)] int id, out int id2, ref int id3)
 	{
 		id2 = 10;
 		this.Redirect(r => r.Blogs().Edit(10));
@@ -67,7 +87,7 @@ public class RootController : IEntryController
 	[Path("Blogs")]
 	public BlogController Blogs()
 	{
-		return new BlogController
+		return new Blog2Controller
 		{
 			Master = new MasterView { HeadTitle = "Blogs" }
 		};

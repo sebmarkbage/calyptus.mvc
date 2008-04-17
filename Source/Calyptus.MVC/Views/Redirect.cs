@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using System.Web;
 
 namespace Calyptus.MVC
 {
@@ -12,8 +13,11 @@ namespace Calyptus.MVC
 
 		protected void Render(IHttpContext context, string url)
 		{
-			context.Response.Redirect(url, false);
-			if (Permanent) context.Response.StatusCode = 301;
+			IHttpResponse response = context.Response;
+			response.Clear();
+			response.RedirectLocation = url;
+			response.StatusCode = Permanent ? 301 : 302;
+			response.Write("<html><head><title>The object has moved</title></head><body><h2><a href=\"" + HttpUtility.HtmlAttributeEncode(url) + "\">Click here</a></h2></body></html>");
 		}
 	}
 

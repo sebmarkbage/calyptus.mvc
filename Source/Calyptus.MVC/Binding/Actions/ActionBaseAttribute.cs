@@ -334,11 +334,12 @@ namespace Calyptus.MVC
 
 		private bool AcceptJsonBeforeXml(string[] acceptTypes)
 		{
-			foreach (string type in acceptTypes)
-				if (IsJson(type))
-					return true;
-				else if (IsXml(type))
-					return false;
+			if (acceptTypes != null)
+				foreach (string type in acceptTypes)
+					if (IsJson(type))
+						return true;
+					else if (IsXml(type))
+						return false;
 			return false;
 		}
 

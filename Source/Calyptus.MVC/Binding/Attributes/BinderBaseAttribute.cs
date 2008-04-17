@@ -20,7 +20,7 @@ namespace Calyptus.MVC
 		protected bool AcceptRef { get; set; }
 
 		protected bool IsOut { get; private set; }
-		protected bool IsRef { get; private set; }
+		protected bool IsIn { get; private set; }
 
 		protected override Type DefaultParameterBinderType
 		{
@@ -32,7 +32,8 @@ namespace Calyptus.MVC
 
 		void IParameterBinding.Initialize(ParameterInfo parameter)
 		{
-
+			IsIn = !parameter.IsOut;
+			IsOut = parameter.ParameterType.IsByRef;
 			BindingTargetType = parameter.ParameterType;
 			Initialize(parameter);
 		}
@@ -44,6 +45,8 @@ namespace Calyptus.MVC
 
 		void IPropertyBinding.Initialize(PropertyInfo property)
 		{
+			IsIn = property.CanWrite;
+			IsOut = property.CanRead;
 			BindingTargetType = property.PropertyType;
 			Initialize(property);
 		}
