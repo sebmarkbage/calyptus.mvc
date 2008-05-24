@@ -146,7 +146,10 @@ namespace Calyptus.MVC
 				if (!requireEntry || b is IEntryControllerBinding)
 				{
 					IPathStack trialStack = new PathStack(false);
-					b.SerializeToPath(action, trialStack);
+					if (requireEntry)
+						((IEntryControllerBinding)b).SerializeToPath(action, trialStack);
+					else
+						b.SerializeToPath(action, trialStack);
 
 					IRouteAction childAction = action.ChildAction;
 					if (childAction != null)
