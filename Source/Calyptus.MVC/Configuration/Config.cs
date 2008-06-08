@@ -16,7 +16,8 @@ namespace Calyptus.MVC.Configuration
 
 		static Config()
 		{
-			Current = (Config) ConfigurationManager.GetSection("calyptus.mvc");
+			Current = ConfigurationManager.GetSection("calyptus.mvc") as Config;
+			if (Current == null) Current = new Config();
 		}
 
 		[ConfigurationProperty("extension", IsRequired = false)]

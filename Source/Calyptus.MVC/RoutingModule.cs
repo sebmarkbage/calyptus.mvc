@@ -33,16 +33,19 @@ namespace Calyptus.MVC
 				DirectoryInfo dir = new DirectoryInfo(request.MapPath("~/"));
 				List<string> paths = new List<string>();
 				foreach (FileInfo file in dir.GetFiles())
-					if (file.Name != "web.config" && file.Name != "default.aspx")
+					if (!file.Name.Equals("web.config", StringComparison.InvariantCultureIgnoreCase) && !file.Name.Equals("default.aspx", StringComparison.InvariantCultureIgnoreCase))
 						paths.Add(file.Name);
 				foreach (DirectoryInfo d in dir.GetDirectories())
-					if (d.Name != "App_Data" && d.Name != "App_Code")
+					if (!d.Name.Equals("App_Data", StringComparison.InvariantCultureIgnoreCase) && !d.Name.Equals("App_Code", StringComparison.InvariantCultureIgnoreCase))
 						paths.Add(d.Name);
 				_ignorePaths = paths.ToArray();
 			}
 			string p = request.AppRelativeCurrentExecutionFilePath;
 			int i = p.IndexOf('/', 2);
 			p = i < 0 ? p.Substring(2) : p.Substring(2, i - 2);
+			HttpContext.Current.Response.Write(p + "==");
+			foreach(string path in _ignorePaths)
+				HttpContext.Current.Response.Write(path + "OR");
 			return _ignorePaths.Contains(p, StringComparer.InvariantCultureIgnoreCase);
 		}
 
