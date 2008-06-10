@@ -43,9 +43,6 @@ namespace Calyptus.MVC
 			string p = request.AppRelativeCurrentExecutionFilePath;
 			int i = p.IndexOf('/', 2);
 			p = i < 0 ? p.Substring(2) : p.Substring(2, i - 2);
-			HttpContext.Current.Response.Write(p + "==");
-			foreach(string path in _ignorePaths)
-				HttpContext.Current.Response.Write(path + "OR");
 			return _ignorePaths.Contains(p, StringComparer.InvariantCultureIgnoreCase);
 		}
 
