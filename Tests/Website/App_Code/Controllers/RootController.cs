@@ -16,6 +16,12 @@ public class RootController : IEntryController
 		return new DefaultView { Title = Path };
 	}
 
+	[Path("GoToIndex")]
+	public IViewTemplate GoToIndex()
+	{
+		return new Redirect(() => new RootController().Circular().Index());
+	}
+
 	// bla...
 	// { ID: 5, Name: 'Name' }
 	// { obj: { ID: 5, Name: 'Name' }, id: 123 }
@@ -84,7 +90,7 @@ public class RootController : IEntryController
 	public void Save([Path(DefaultValue=-1)] int id, out int id2, ref int id3)
 	{
 		id2 = 10;
-		this.Redirect(r => r.Blogs().Edit(10));
+		//this.Redirect(r => r.Blogs().Edit(10));
 	}
 
 	[Path("Blogs")]

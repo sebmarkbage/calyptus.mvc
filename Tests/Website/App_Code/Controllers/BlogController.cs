@@ -12,7 +12,7 @@ public class BlogController : IEntryController, IDisposable
 	public virtual IViewTemplate Index(IPathStack path)
 	{
 		return new Redirect<RootController>(r => r.Index());
-		return new RootController.DefaultView { Title = "BlogsIndex", Path = path };
+		//return new RootController.DefaultView { Title = "BlogsIndex", Path = path };
 		//return new Redirect<RootController>(r => r.Index(), true);
 	}
 
