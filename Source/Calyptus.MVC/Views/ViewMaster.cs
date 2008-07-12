@@ -41,9 +41,9 @@ namespace Calyptus.MVC
 			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, action);
 		}
 
-		protected virtual string URLAbsolute<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController
+		protected virtual string URL(Expression<Action> action)
 		{
-			return Route.GetAbsolutePath<TEntryController>(action);
+			return Route.GetAbsolutePath(action);
 		}
 
 		internal virtual void SetTemplate(IViewTemplate template)

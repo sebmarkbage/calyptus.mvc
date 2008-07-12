@@ -17,6 +17,6 @@ namespace Calyptus.MVC
 
 		string GetRelativePath<TRelativeController>(int index, Expression<Action<TRelativeController>> action);
 		string GetRelativePath<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action);
-		string GetAbsolutePath<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController;
+		string GetAbsolutePath(Expression<Action> action);
 	}
 }

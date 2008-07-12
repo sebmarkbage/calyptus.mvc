@@ -103,7 +103,6 @@
     <Compile Include="ViewFactories\ViewFactoryBase.cs" />
     <Compile Include="Views\Redirect.cs" />
     <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Binding\Extensions\IExtension.cs" />
     <Compile Include="Controllers\IController.cs" />
     <Compile Include="Helpers\Json.cs" />

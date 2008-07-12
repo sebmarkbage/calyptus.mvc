@@ -37,9 +37,9 @@ namespace Calyptus.MVC
 			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, action);
 		}
 
-		protected virtual string URLAbsolute<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController
+		protected virtual string URLAbsolute(Expression<Action> action)
 		{
-			return Route.GetAbsolutePath<TEntryController>(action);
+			return Route.GetAbsolutePath(action);
 		}
 
 		public string ContentType

@@ -137,7 +137,17 @@ namespace Calyptus.MVC
 						type = firstParam.Type;
 					}
 					else
-						throw new BindingException(String.Format("Only the first parameter of the lambda, casts and method call may be used. The first controller must be the first parameter of the lambda ({0}).", expression.Parameters[0].Name));
+					{
+						NewExpression newParam = call.Object as NewExpression;
+						if (newParam != null)
+						{
+							call = null;
+							type = newParam.Type;
+						}
+						else
+							throw new BindingException(String.Format("Only new-expressions, the first parameter of the lambda, casts and method call may be used. The first controller must be the first parameter of the lambda ({0}) or a new-expression.", expression.Parameters[0].Name));
+						// TODO: Allow reference equals to existing controller (or bound parameter) in the route context
+					}
 				}				
 
 				action = new RouteAction(type, method, parameters, action);
@@ -147,17 +157,17 @@ namespace Calyptus.MVC
 
 		public string GetRelativePath<TRelativeController>(int index, Expression<Action<TRelativeController>> action)
 		{
+			var expr = action as LambdaExpression;
+			if (expr == null) throw new BindingException("Missing action expression.");
+
 			int pathIndex = GetPathIndexOf(typeof(TRelativeController), index);
 			if (pathIndex == -1)
 			{
 				if (index == 0 || index == -1)
-					return GetAbsolutePathPrivate<TRelativeController>(action);
+					return GetAbsolutePathPrivate(action);
 				else
 					throw new BindingException(String.Format("Index out of bounds. The controller ({0}) have been initialized fewer than {1} times.", typeof(TRelativeController).Name, index < 0 ? -index : index + 1));
 			}
-
-			var expr = action as LambdaExpression;
-			if (expr == null) throw new BindingException();
 
 			IRouteAction route = BuildAction(expr);
 
@@ -182,19 +192,18 @@ namespace Calyptus.MVC
 			throw new NotImplementedException();
 		}
 
-		public string GetAbsolutePath<TEntryController>(Expression<Action<TEntryController>> action) where TEntryController : class, IEntryController
-		{
-			return GetAbsolutePathPrivate<TEntryController>(action);
-		}
-
-		private string GetAbsolutePathPrivate<TEntryController>(Expression<Action<TEntryController>> action)
+		public string GetAbsolutePath(Expression<Action> action)
 		{
 			var expr = action as LambdaExpression;
-			if (expr == null) throw new BindingException();
+			if (expr == null) throw new BindingException("Missing action expression.");
+			return GetAbsolutePathPrivate(expr);
+		}
 
+		private string GetAbsolutePathPrivate(LambdaExpression expr)
+		{
 			IRouteAction route = BuildAction(expr);
 
-			if (action == null) return _appPath;
+			if (route == null) return _appPath;
 
 			PathStack path = new PathStack(false);
 

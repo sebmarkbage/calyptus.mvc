@@ -23,34 +23,44 @@ namespace Calyptus.MVC
 
 	public class Redirect : RedirectBase, IView
 	{
+		private bool isUrl;
 		private string url;
 		public string URL { get { return url; } }
+		public Expression<Action> Action { get; private set; }
 
-		public Redirect(string url)
-		{
-			this.url = url;
-		}
+		public Redirect(string url) : this(url, false) { }
 
-		public Redirect(Uri uri)
-		{
-			this.url = uri.AbsolutePath;
-		}
+		public Redirect(Uri uri) : this(uri, false) { }
 
 		public Redirect(string url, bool permanently)
 		{
+			this.isUrl = true;
 			this.url = url;
 			this.Permanent = permanently;
 		}
 
 		public Redirect(Uri uri, bool permanently)
 		{
+			this.isUrl = true;
 			this.url = uri.AbsolutePath;
 			this.Permanent = permanently;
 		}
 
+		public Redirect(Expression<Action> action) : this(action, false) { }
+
+		public Redirect(Expression<Action> action, bool permanently)
+		{
+			this.isUrl = false;
+			Action = action;
+			Permanent = permanently;
+		}
+
 		void IRenderable.Render(IHttpContext context)
 		{
-			base.Render(context, url);
+			if (isUrl)
+				base.Render(context, url);
+			else
+				base.Render(context, context.Route.GetAbsolutePath(Action));
 		}
 
 		string IView.ContentType
@@ -153,36 +163,6 @@ namespace Calyptus.MVC
 		void IRenderable.Render(IHttpContext context)
 		{
 			base.Render(context, context.Route.GetRelativePath<TRelativeController, TWithActionsFromController>(Index, SecondIndex, Action));
-		}
-
-		string IView.ContentType
-		{
-			get { return "text/html"; }
-		}
-
-		void IView.Render(System.IO.Stream stream)
-		{
-			throw new NotImplementedException("Can't render a redirect to a stream.");
-		}
-	}
-
-	public class RedirectAbsolute<TEntryController> : RedirectBase, IView where TEntryController : class, IEntryController
-	{
-		public Expression<Action<TEntryController>> Action { get; private set; }
-
-		public RedirectAbsolute(Expression<Action<TEntryController>> action)
-		{
-			Action = action;
-		}
-		public RedirectAbsolute(Expression<Action<TEntryController>> action, bool permanently)
-		{
-			Action = action;
-			Permanent = permanently;
-		}
-
-		void IRenderable.Render(IHttpContext context)
-		{
-			base.Render(context, context.Route.GetAbsolutePath<TEntryController>(Action));
 		}
 
 		string IView.ContentType

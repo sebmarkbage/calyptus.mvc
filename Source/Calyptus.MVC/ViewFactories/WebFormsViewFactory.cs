@@ -107,7 +107,7 @@ namespace Calyptus.MVC
 
 			string simpleName = name.Length > 4 && name.EndsWith("View", StringComparison.InvariantCultureIgnoreCase) ? name.Substring(0, name.Length - 4) : null;
 			string simpleControllerName;
-			if (controllerName.Contains("Controller"))
+			if (controllerName != null && controllerName.Contains("Controller"))
 			{
 				string[] cn = controllerName.Split('/');
 				for (int ii = 0; ii < cn.Length; ii++)
