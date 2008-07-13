@@ -1,0 +1,91 @@
+Root
+
+Page/Page/Page/Page/Edit
+
+
+[RootController]
+class RootController
+{
+	public RootController(Page p, string t)
+	{
+		
+	}
+
+	public RootController(PartialDate d, Post p)
+	{
+		
+	}
+}
+
+[Controller("Blogs")]
+class BlogsController
+{
+	public BlogsController
+	{
+		Page p
+	}
+}
+
+
+Kdsfgksdfglr/test/test/teast/klsretpokret/Edit
+
+class Page : IPathBindable<Page>
+{
+	public Page()
+	{
+	}
+
+	public static bool ReadURLBinding(PathReader r, out Page p)
+	{
+		string id = r.Read();
+		if (id is in db)
+		{
+			Page child;
+			if (Page.TryURLBinding(r, out child))
+			{
+				p = new Page { ID = id, Child = child };
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void WritePathBinding(PathWriter w)
+	{
+		w.Add(this.id);
+		this.Child.WritePathBinding(w);
+	}
+}
+
+
+PageTree
+{
+
+}
+
+
+
+
+[Controller("Blogs")]
+
+
+
+BlogsController.
+
+
+
+GetURL(new RootController(Users.CurrentUser, new BlogController(new Blog(), new PartialDate(2007, 7,
+10)).Default()));
+
+
+BlogController.
+BlogController.Filter(new PartialDate(2007, 7, 10));
+BlogController.SelectBlog(new Blog());
+
+
+
+
+<%= GetURL(PostController.BlogController.ChangeSideStep(ID)); %>
+
+<% Redirect(PostController.BlogController.View()); %>
+

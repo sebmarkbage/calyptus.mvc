@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<?cs
+	using Calyptus.MVC;
+	Blog blog;
+	Post post;
+?>
+<cs:child xmlns="http://www.w3.org/1999/xhtml" xmlns:cs="http://templateengine/cs/">
+	<cs:content placeholder="Sidebar">
+		<ul cs:if="blog.Posts">
+			<li cs:foreach="Post p in blog.Posts">
+				<a href="{cs:p.Href}">{cs:p.Name}</a>
+				<a cs:action="BlogController.Edit(p.ID)">Edit</a>
+		</li>
+		</ul>
+	</cs:content>
+	<cs:content placeholder="Content">
+		<h1>Header</h1>
+		<p>Paragraf är en sak.</p>
+	</cs:content>
+</cs:child>

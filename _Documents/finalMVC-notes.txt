@@ -1,0 +1,342 @@
+.Method(data, data).Method(data, data);
+
+new Class(new Class(data, data), data, data).Method(data, data);
+
+var c = new Class(data, data);
+c.Prop1 = data;
+c.Prop2 = data;
+c.Method(data);
+
+
+new Controllers.BDS(city, store);
+
+
+new PostController(new PostsController(BlogController(BlogsController(new RootController()))))
+
+
+/Blogs -> var q = from b in db.Blogs select b;
+
+/Sebs_Blog -> Blog b = q.First<Blog>(b => b.FriendlyID = "Sebs_Blog"); var q = from i in b.Items where i is Post select i;
+
+/2007 -> var q = from i in q where i.Date.Year = 2007 select i;
+
+/Mars -> var q = from i in q where i.Date.Month = 3 select i;
+
+/Sebs_Post -> var q = from i in q where i.FriendlyID = "Sebs_Post" select i;
+
+/Redigera -> Edit();
+
+
+[Controller(Keyword="Blogs")]
+public class BlogsController : IPartialDateFilter
+	
+	public PartialDate DateFilter { get; set; }
+	public Expression<Action> ChangeDateFilterAction(PartialDate d) { return () => new BlogsController(this.Root, this.Blog, d).Default(); }
+
+	public BlogsController([Parent("Blog")] RootController root, [BlogSerializer] Blog blog, PartialDate date)
+	{
+	}
+
+	public BlogsController([Parent] RootController root, [PostSerializer] Post post) : this(root, post.Blog, new PartialDate(post.Date))
+	{
+	}
+
+
+
+public RootController : IRootController
+{
+
+	public RootController()
+	{
+	}
+
+	DB
+	
+}
+
+
+
+public BlogsController
+{
+	UserController user;
+
+	public BlogsController(IUserController user)
+	{
+		Blogs = user.User.Blogs;
+	}
+	public BlogsController(IRootController root)
+	{
+		Blogs = root.db.Blogs;
+	}
+}
+
+public BlogController
+{
+	public BlogController([Parent] BlogsController blogs, [Path] string friendlyid)
+	{
+		Blog = blogs.Blogs.Where(friendlyid).First();
+	}
+}
+
+
+public WebShopControlller : IPagesContainer
+{
+	IQueryable<Page> Pages;
+}
+
+public PageController : IPagesContainer
+{
+	Page Parent;
+	Page Page;
+	IQueryable<Page> Pages;
+
+	public PagesController(IPagesContainer container, string pagefriendlyname)
+	{
+		if (container is PageController) Parent = (container as PageController).Page;
+		this.Page = container.Pages.Where(p => p.FriendlyName == pagefriendlyname);
+		this.Pages = this.Page.Children;
+	}
+
+	public void Edit()
+	{
+		
+	}
+}
+
+
+public PostsController : IPostsContainer
+{
+	public IQueryable<Items> Items;
+
+	public PostsController([Parent] IPostsContainer posts)
+	{
+		
+	}
+
+	public Expression<Action> ChangePartialDateAction(PartialDate date)
+	{
+		if ( tags != null )
+			return () => new PostsController(posts, date).List();
+		else
+			return () => new PostsController(posts, date, tags).List();
+	}
+
+	public PostsController([Parent] IPostsContainer posts, [Path] PartialDate date)
+	{
+		Posts = posts.Posts.Where(date);
+	}
+
+	public PostsController([Parent] IPostsContainer posts, [Path("Tags")] string[] tags)
+	{
+		Posts = posts.Posts.Where(tags);
+	}
+
+	public void List()
+	{
+		RenderView("Views/Blogs/ListPosts", Items);
+	}
+}
+
+
+URL<PostsController>( c => c.List(new PartialDate(2007, 5, 5)) );
+
+URL( () => new PostsController(container, new PartialDate(2007, 5, 5)).List() );
+
+
+public class ItemFilters : IPathSerializable
+{
+	public PartialDate Date;
+	public string[] String;
+}
+
+
+public PostController : Controller
+{
+	public PostController([Parent] PostsController posts, [Path] string friendlyid)
+	{
+		Post = posts.Posts.Where(friendlyid).First();
+	}
+	
+	public void View()
+	{
+		RenderView("Blogs/ViewPost", this);
+	}
+}
+
+
+
+
+public class ViewPost : UserMaster
+{
+	public ViewPost(PostController postController) : this(postController.Posts.User)
+	{
+	}
+}
+
+public class UserMaster : MasterPage
+{
+	public UserMaster(UserController usercontroller) : this(usercontroller.Root)
+	{
+	}
+}
+
+public class MasterPage : ViewPage 
+
+{
+	public RootController Root;
+
+	public MasterPage(Root root)
+	{
+		this.Root = root;
+	}
+}
+
+
+
+
+URL(() => new PostController(posts, p.FriendlyID).View());
+
+
+
+
+
+
+IPartialDateFilter Controller;
+
+<%= URL(Controller.ChangeDateFilterAction(selectedDate)) %>
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+<%
+ var BlogController = new Controller(parent, name, obj);
+%>
+
+<a href="<%= URL(() => BlogController.Default()) %>" />
+
+
+
+
+[Controller alt. RootController]
+class Controller : IPathSerializableConstructor
+{
+	[Cookie]
+	string Property { get; set; }
+
+	[Get]
+	int Property2 { get; set; }
+
+	[Get]
+	[Post("p3")]
+	[SOAPHeader]
+	Object Property2 { get; set; }
+
+	ParentController Parent { get; set; }
+	Type Type { get; set { OnNotifyChanges("Type"); } }
+
+	event ... NotifyChanges;
+
+	public Expression<Action> GetConstructor()
+	{
+		if (Type == null)
+			return () => new Controller(Parent);
+		else
+			return () => new Controller(Parent, Type, new Object());
+	}
+
+	[Controller("Blogs")]
+	Controller( [Parent("Parent")] ParentController parent, [Path("Type", "SomeKeyword")] Type name, [CustomDateTime] Object obj )
+	{
+		this.Parent = parent;
+	}
+	Controller( [Parent("Parent")] ParentController parent )
+	{
+		
+	}
+
+	[Action alt. DefaultAction]
+	IView Default()
+	{
+	}
+
+	[Action("Action") alt. Method("Action")]
+	IView Action( [Post] Type1 name1, [Get] Type2 name2 )
+	{
+	}
+
+	[SOAPHead]
+	[Get]
+	[Post]
+	[Cookie]
+	string Property { get; set; }
+}
+
+
+[PathSerializable]
+class Object : IPathSerializableConstructor
+{
+	Expression<Action> GetConstructor()
+	{
+		return () => new Object(y, m, d);
+	}
+
+	Object( [IntPath("\d{4}", 1900, 2099)] int year, [IntPath(1, 12)] int month, [IntPath(1, 31)] int day, [Path("Tags")] string[] tags )
+	{
+		
+	}
+
+}
+
+
+class Object : IPathSerializable
+{
+	static bool TryPathDeserialize(PathReader r, out Object obj)
+	{
+		int y, m, d;
+
+		string s = r.Read();
+		if (s.Length != 4 || !int.TryParse(s, out y))
+			return false;
+
+		s = r.Read();
+		if (!int.TryParse(s, out m) || m < 1 || m > 12)
+			return false;
+		
+		s = r.Read();
+		if (!int.TryParse(s, out d) || d < 1 || d > 31)
+			return false;
+
+		obj = new Object(y, m, d);
+
+		return true;
+	}
+
+	void PathSerialize(PathWriter w)
+	{
+		w.Write(y.ToString());
+		w.Write(m.ToString("00"));
+		w.Write(d.ToString("00"));
+	}
+}
+
+class CustomDateTimeAttribute : PathAttribute<DateTime>
+{
+	override bool TryPathDeserialize(PathReader r, out DateTime obj)
+	{
+		string s = r.Read();
+		if (!DateTime.TryParse(s, out obj))
+			return false;
+		return true;
+	}
+
+	override void PathSerialize(PathWriter w, DateTime obj)
+	{
+		w.Write(obj.ToString());
+	}
+}
+
+class IntPath : PathAttribute(int)
+{
+	
+}

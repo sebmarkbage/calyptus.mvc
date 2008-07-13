@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<?cs
+?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:cs="http://templateengine/cs/">
+	<body>
+		<div cs:placeholder="Sidebar">
+			Sidebar
+		</div>
+		<div cs:placeholder="Content">
+			Content
+		</div>
+	</body>
+</html>
