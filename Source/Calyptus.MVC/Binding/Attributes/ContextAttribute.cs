@@ -18,20 +18,33 @@ namespace Calyptus.MVC
 		private Func<IHttpContext, object> binder;
 		private bool isPrincipal;
 		private bool isTicket;
+		private bool isCookie;
 		private bool isPathStack;
+		private string name;
 
 		public void Initialize(ParameterInfo parameter)
 		{
 			if (parameter.ParameterType == typeof(IPathStack)) { isPathStack = true; return; }
 			isTicket = parameter.ParameterType == typeof(FormsAuthenticationTicket);
-			binder = GetBinder(parameter.ParameterType);
+			isCookie = parameter.ParameterType == typeof(HttpCookie);
+			if (isCookie)
+				binder = c => c.Request.Cookies[name];
+			else
+				binder = GetBinder(parameter.ParameterType);
+			name = parameter.Name;
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", parameter.ParameterType.Name));
 		}
 
 		public void Initialize(PropertyInfo property)
 		{
-			binder = GetBinder(property.PropertyType);
 			isPrincipal = property.PropertyType == typeof(IPrincipal);
+			isTicket = property.PropertyType == typeof(FormsAuthenticationTicket);
+			isCookie = property.PropertyType == typeof(HttpCookie);
+			if (isCookie)
+				binder = c => c.Request.Cookies[name];
+			else
+				binder = GetBinder(property.PropertyType);
+			name = property.Name;
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", property.PropertyType.Name));
 		}
 
@@ -50,7 +63,7 @@ namespace Calyptus.MVC
 
 		public static bool IsContextType(Type type)
 		{
-			return (type == typeof(IPathStack) || GetBinder(type) != null);
+			return (type == typeof(IPathStack) || type == typeof(HttpCookie) || GetBinder(type) != null);
 		}
 
 		private static Func<IHttpContext, object> GetBinder(Type type)
@@ -89,17 +102,22 @@ namespace Calyptus.MVC
 		public void StoreBinding(IHttpContext context, object value)
 		{
 			if (isPrincipal) context.User = (IPrincipal)value;
-			if (isTicket)
+			else if (isCookie) context.Response.SetCookie((HttpCookie)value);
+			else if (isTicket)
 			{
-				HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, FormsAuthentication.Encrypt((FormsAuthenticationTicket)value))
+				if (value == null) context.Response.Cookies.Remove(FormsAuthentication.FormsCookieName);
+				else
 				{
-					Domain = FormsAuthentication.CookieDomain,
-					Path = FormsAuthentication.FormsCookiePath,
-					Secure = FormsAuthentication.RequireSSL
-				};
-				if (((FormsAuthenticationTicket)value).IsPersistent)
-					cookie.Expires = ((FormsAuthenticationTicket)value).Expiration;
-				context.Response.SetCookie(cookie);
+					HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, FormsAuthentication.Encrypt((FormsAuthenticationTicket)value))
+					{
+						Domain = FormsAuthentication.CookieDomain,
+						Path = FormsAuthentication.FormsCookiePath,
+						Secure = FormsAuthentication.RequireSSL
+					};
+					if (((FormsAuthenticationTicket)value).IsPersistent)
+						cookie.Expires = ((FormsAuthenticationTicket)value).Expiration;
+					context.Response.SetCookie(cookie);
+				}
 			}
 			// Else Exclude
 		}
