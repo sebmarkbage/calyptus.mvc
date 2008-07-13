@@ -88,8 +88,11 @@ namespace Calyptus.MVC
 
 		private IRouteAction BuildAction(LambdaExpression expression)
 		{
-			if (expression.Body.NodeType == ExpressionType.Parameter) return null;
-			if (expression.Body.NodeType != ExpressionType.Call) throw new BindingException("Invalid lambda expression. Cannot serialize.");
+			if (expression == null) return null;
+			if (expression.Body.NodeType == ExpressionType.Parameter || expression.Body.NodeType == ExpressionType.New)
+				return new RouteAction(expression.Body.Type, null, null, null);
+			if (expression.Body.NodeType != ExpressionType.Call)
+				throw new BindingException("Invalid lambda expression. Cannot serialize. Must be only parameter or end in method call.");
 
 			RouteAction action = null;
 			//var type = expression.Parameters[0].Type;
@@ -158,7 +161,6 @@ namespace Calyptus.MVC
 		public string GetRelativePath<TRelativeController>(int index, Expression<Action<TRelativeController>> action)
 		{
 			var expr = action as LambdaExpression;
-			if (expr == null) throw new BindingException("Missing action expression.");
 
 			int pathIndex = GetPathIndexOf(typeof(TRelativeController), index);
 			if (pathIndex == -1)
@@ -169,33 +171,36 @@ namespace Calyptus.MVC
 					throw new BindingException(String.Format("Index out of bounds. The controller ({0}) have been initialized fewer than {1} times.", typeof(TRelativeController).Name, index < 0 ? -index : index + 1));
 			}
 
+			// TODO: If new expression is used, fallback to absolute path
+
 			IRouteAction route = BuildAction(expr);
 
 			StringBuilder p = new StringBuilder();
-
-			if (action == null) return "./";
 
 			for (int i = pathIndex; i < _pathCount - 1; i++)
 				p.Append("../");
 
 			PathStack path = new PathStack(false);
-			RoutingEngine.SerializeRelativePath(route, path);
-			if (path.Count == 0 && p.Length == 0) p.Append("./");
+			
+			if (route != null)
+				RoutingEngine.SerializeRelativePath(route, path);
 
-			p.Append(path.GetPath(pathIndex == 0));
+			if (path.Count == 0 && p.Length == 0)
+				p.Append("./");
+			else
+				p.Append(path.GetPath(pathIndex == 0));
 
 			return p.ToString();
 		}
 
 		public string GetRelativePath<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException("Get relative path with actions form controller is not yet implemented.");
 		}
 
 		public string GetAbsolutePath(Expression<Action> action)
 		{
 			var expr = action as LambdaExpression;
-			if (expr == null) throw new BindingException("Missing action expression.");
 			return GetAbsolutePathPrivate(expr);
 		}
 

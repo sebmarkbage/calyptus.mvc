@@ -74,27 +74,18 @@ namespace Calyptus.MVC
 		}
 	}
 
-	public class Redirect<TRelativeController> : RedirectBase, IView where TRelativeController : IController
+	public class Redirect<TRelativeController> : RedirectBase, IView
 	{
 		public int Index { get; private set; }
 		public Expression<Action<TRelativeController>> Action { get; private set; }
 
-		public Redirect(Expression<Action<TRelativeController>> action)
-		{
-			Index = -1;
-			Action = action;
-		}
-		public Redirect(int index, Expression<Action<TRelativeController>> action)
-		{
-			Index = index;
-			Action = action;
-		}
-		public Redirect(Expression<Action<TRelativeController>> action, bool permanently)
-		{
-			Index = -1;
-			Action = action;
-			Permanent = permanently;
-		}
+		public Redirect() : this(-1, null, false) { }
+		public Redirect(int index) : this(index, null, false) { }
+		public Redirect(bool permanently) : this(-1, null, permanently) { }
+		public Redirect(int index, bool permanently) : this(-1, null, permanently) { }
+		public Redirect(Expression<Action<TRelativeController>> action) : this(-1, action, false) {}
+		public Redirect(int index, Expression<Action<TRelativeController>> action) : this(index, action, false) { }
+		public Redirect(Expression<Action<TRelativeController>> action, bool permanently) : this(-1, action, permanently) { }
 		public Redirect(int index, Expression<Action<TRelativeController>> action, bool permanently)
 		{
 			Index = index;
@@ -118,40 +109,24 @@ namespace Calyptus.MVC
 		}
 	}
 
-	public class Redirect<TRelativeController, TWithActionsFromController> : RedirectBase, IView where TRelativeController : IController where TWithActionsFromController : IController
+	public class Redirect<TRelativeController, TWithActionsFromController> : RedirectBase, IView
 	{
 		public int Index { get; private set; }
 		public int SecondIndex { get; private set; }
 		public Expression<Func<TRelativeController, TWithActionsFromController>> Action { get; private set; }
 
-		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action)
-		{
-			Index = -1;
-			Action = action;
-		}
-		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action)
-		{
-			Index = index;
-			Action = action;
-		}
-		public Redirect(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action)
-		{
-			Index = index;
-			SecondIndex = secondIndex;
-			Action = action;
-		}
-		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
-		{
-			Index = -1;
-			Action = action;
-			Permanent = permanently;
-		}
-		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
-		{
-			Index = index;
-			Action = action;
-			Permanent = permanently;
-		}
+		public Redirect() : this(-1, 0, null, false) { }
+		public Redirect(int index) : this(index, 0, null, false) { }
+		public Redirect(int index, int secondIndex) : this(index, secondIndex, null, false) { }
+		public Redirect(bool permanently) : this(-1, 0, null, permanently) { }
+		public Redirect(int index, bool permanently) : this(index, 0, null, permanently) { }
+		public Redirect(int index, int secondIndex, bool permanently) : this(index, secondIndex, null, permanently) {  }
+
+		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action) : this(-1, 0, action, false) { }
+		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action) : this(index, 0, action, false) { }
+		public Redirect(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action) : this(index, secondIndex, action, false) { }
+		public Redirect(Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently) : this(-1, 0, action, permanently) { }
+		public Redirect(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently) : this(index, 0, action, permanently) { }
 		public Redirect(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action, bool permanently)
 		{
 			Index = index;

@@ -16,27 +16,57 @@ namespace Calyptus.MVC
 
         public IRouteContext Route { get; set; }
 
-		protected virtual string URL<TRelativeController>(Expression<Action<TRelativeController>> action) where TRelativeController : IController
+		protected virtual string URL()
+		{
+			return Route.GetAbsolutePath(null);
+		}
+
+		protected virtual string URL<TRelativeController>()
+		{
+			return Route.GetRelativePath<TRelativeController>(-1, null);
+		}
+
+		protected virtual string URL<TRelativeController>(int index)
+		{
+			return Route.GetRelativePath<TRelativeController>(index, null);
+		}
+
+		protected virtual string URL<TRelativeController, TWithActionsFromController>()
+		{
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(-1, 0, null);
+		}
+
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index)
+		{
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, 0, null);
+		}
+
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, int secondIndex)
+		{
+			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, null);
+		}
+
+		protected virtual string URL<TRelativeController>(Expression<Action<TRelativeController>> action)
 		{
 			return Route.GetRelativePath<TRelativeController>(-1, action);
 		}
-
-		protected virtual string URL<TRelativeController>(int index, Expression<Action<TRelativeController>> action) where TRelativeController : IController
+		
+		protected virtual string URL<TRelativeController>(int index, Expression<Action<TRelativeController>> action)
 		{
 			return Route.GetRelativePath<TRelativeController>(index, action);
 		}
 
-		protected virtual string URL<TRelativeController, TWithActionsFromController>(Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
 			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(-1, 0, action);
 		}
 
-		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
 			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, 0, action);
 		}
 
-		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action) where TRelativeController : IController where TWithActionsFromController : IController
+		protected virtual string URL<TRelativeController, TWithActionsFromController>(int index, int secondIndex, Expression<Func<TRelativeController, TWithActionsFromController>> action)
 		{
 			return Route.GetRelativePath<TRelativeController, TWithActionsFromController>(index, secondIndex, action);
 		}
