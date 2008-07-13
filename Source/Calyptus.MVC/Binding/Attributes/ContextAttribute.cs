@@ -8,6 +8,7 @@ using System.Web.Caching;
 using System.IO;
 using System.Xml;
 using System.Web.Profile;
+using System.Web.Security;
 
 namespace Calyptus.MVC
 {
@@ -16,11 +17,13 @@ namespace Calyptus.MVC
 	{
 		private Func<IHttpContext, object> binder;
 		private bool isPrincipal;
+		private bool isTicket;
 		private bool isPathStack;
 
 		public void Initialize(ParameterInfo parameter)
 		{
 			if (parameter.ParameterType == typeof(IPathStack)) { isPathStack = true; return; }
+			isTicket = parameter.ParameterType == typeof(FormsAuthenticationTicket);
 			binder = GetBinder(parameter.ParameterType);
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", parameter.ParameterType.Name));
 		}
@@ -56,6 +59,7 @@ namespace Calyptus.MVC
 			else if (type == typeof(Cache)) return c => c.Cache;
 			else if (type == typeof(HttpApplicationState)) return c => c.Application;
 			else if (type == typeof(HttpApplication)) return c => c.ApplicationInstance;
+			else if (type == typeof(FormsAuthenticationTicket)) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
 			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;
@@ -85,6 +89,18 @@ namespace Calyptus.MVC
 		public void StoreBinding(IHttpContext context, object value)
 		{
 			if (isPrincipal) context.User = (IPrincipal)value;
+			if (isTicket)
+			{
+				HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, FormsAuthentication.Encrypt((FormsAuthenticationTicket)value))
+				{
+					Domain = FormsAuthentication.CookieDomain,
+					Path = FormsAuthentication.FormsCookiePath,
+					Secure = FormsAuthentication.RequireSSL
+				};
+				if (((FormsAuthenticationTicket)value).IsPersistent)
+					cookie.Expires = ((FormsAuthenticationTicket)value).Expiration;
+				context.Response.SetCookie(cookie);
+			}
 			// Else Exclude
 		}
 
