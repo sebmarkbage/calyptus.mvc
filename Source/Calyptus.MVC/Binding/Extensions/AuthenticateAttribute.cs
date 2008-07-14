@@ -99,10 +99,17 @@ namespace Calyptus.MVC
 							break;
 						}
 
-				FormsAuthentication.RedirectToLoginPage();
+				if (allow)
+				{
+					FormsAuthentication.RedirectToLoginPage();
+					context.Response.End();
+				}
 			}
 			else
+			{
 				FormsAuthentication.RedirectToLoginPage();
+				context.Response.End();
+			}
 		}
 
 		public void OnError(IHttpContext context, ErrorEventArgs args) { }
