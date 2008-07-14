@@ -9,5 +9,8 @@
 	<h1><%= Data.Title %></h1>
     <p><%= URL<RootController>(r => (r.Blogs() as Blog2Controller).Index2()) %></p>
     <p><a href="<%= URL<RootController>(r => r.Blog("My Test...! " + Data.Title).Edit(10)) %>">Test</a></p>
+    <form action="postTest" method="post">
+		<input type="submit" name="submit" value="Skicka" />
+    </form>
 </body>
 </html>

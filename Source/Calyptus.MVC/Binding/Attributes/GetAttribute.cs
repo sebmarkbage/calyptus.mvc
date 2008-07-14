@@ -6,19 +6,14 @@ using Calyptus.MVC.Mapping;
 
 namespace Calyptus.MVC
 {
-	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
-	public class GetAttribute : BinderBaseAttribute
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
+	public class QueryStringAttribute : BinderBaseAttribute
 	{
-		private IMappingBinding _verb = new VerbMapping("GET");
-
 		public string Key { get; set; }
-
-		public GetAttribute()
-		{
-			Mappings.Add(_verb);
-		}
-
-		public GetAttribute(string queryKey) : base()
+		
+		public QueryStringAttribute() { }
+		
+		public QueryStringAttribute(string queryKey) : this()
 		{
 			Key = queryKey;
 		}
@@ -75,7 +70,18 @@ namespace Calyptus.MVC
 	}
 
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
-	public class QueryStringAttribute : GetAttribute
+	public class GetAttribute : QueryStringAttribute
 	{
+		private IMappingBinding _verb = new VerbMapping("GET");
+
+		public GetAttribute() : base()
+		{
+			Mappings.Add(_verb);
+		}
+
+		public GetAttribute(string queryKey) : base(queryKey)
+		{
+			Mappings.Add(_verb);
+		}
 	}
 }

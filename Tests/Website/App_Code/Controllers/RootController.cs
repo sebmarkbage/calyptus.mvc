@@ -36,6 +36,12 @@ public class RootController : IEntryController
 	// obj.id=10&obj.name=Name
 	// 
 
+	[Post(Path="postTest")]
+	public IViewTemplate Save([Form] string text)
+	{
+		return new DefaultView { Title = text };
+	}
+
 	[Post]
 	public void Save([Form] TestObject obj, [Get] int id)
 	{
