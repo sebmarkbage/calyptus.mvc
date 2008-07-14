@@ -74,7 +74,7 @@ namespace Calyptus.MVC
 			else if (type == typeof(Cache)) return c => c.Cache;
 			else if (type == typeof(HttpApplicationState)) return c => c.Application;
 			else if (type == typeof(HttpApplication)) return c => c.ApplicationInstance;
-			else if (type.IsAssignableFrom(typeof(FormsAuthenticationTicket))) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
+			else if (type == typeof(FormsAuthenticationTicket)) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
 			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;

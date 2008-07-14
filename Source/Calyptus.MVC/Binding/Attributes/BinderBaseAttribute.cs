@@ -34,7 +34,7 @@ namespace Calyptus.MVC
 		{
 			IsIn = !parameter.IsOut;
 			IsOut = parameter.ParameterType.IsByRef;
-			BindingTargetType = parameter.ParameterType;
+			BindingTargetType = IsOut ? parameter.ParameterType.GetElementType() : parameter.ParameterType;
 			Initialize(parameter);
 		}
 

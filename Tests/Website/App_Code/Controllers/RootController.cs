@@ -43,9 +43,9 @@ public class RootController : IEntryController
 	// 
 
 	[Post(Path="postTest")]
-	public IViewTemplate Save([Form] string text)
+	public IViewTemplate Save([Form] string text, [QueryString("ReturnUrl")] string q)
 	{
-		return new DefaultView { Title = text };
+		return new DefaultView { Title = text + (q == null ? "null" : "-" + q + "-") };
 	}
 
 	[Post]
