@@ -75,7 +75,7 @@ namespace Calyptus.MVC
 						IParameterBinding b = (IParameterBinding)atts[a];
 						if (b is DefaultAttribute)
 						{
-							b = ContextAttribute.IsContextType(p.ParameterType) ?
+							b = ContextAttribute.IsContextType(p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType) ?
 								new ContextAttribute() :
 								(IParameterBinding)Activator.CreateInstance(DefaultParameterBinderType);
 						}
@@ -85,8 +85,8 @@ namespace Calyptus.MVC
 				}
 				else
 				{
-					IParameterBinding b = 
-						ContextAttribute.IsContextType(p.ParameterType) ?
+					IParameterBinding b =
+						ContextAttribute.IsContextType(p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType) ?
 						new ContextAttribute() :
 						(IParameterBinding)Activator.CreateInstance(DefaultParameterBinderType);
 					b.Initialize(p);

@@ -24,26 +24,28 @@ namespace Calyptus.MVC
 
 		public void Initialize(ParameterInfo parameter)
 		{
-			if (parameter.ParameterType == typeof(IPathStack)) { isPathStack = true; return; }
-			isTicket = parameter.ParameterType == typeof(FormsAuthenticationTicket);
-			isCookie = parameter.ParameterType == typeof(HttpCookie);
+			Type t = parameter.ParameterType.IsByRef ? parameter.ParameterType.GetElementType() : parameter.ParameterType;
+			if (t == typeof(IPathStack)) { isPathStack = true; return; }
+			isTicket = t == typeof(FormsAuthenticationTicket);
+			isCookie = t == typeof(HttpCookie);
 			if (isCookie)
 				binder = c => c.Request.Cookies[name];
 			else
-				binder = GetBinder(parameter.ParameterType);
+				binder = GetBinder(t);
 			name = parameter.Name;
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", parameter.ParameterType.Name));
 		}
 
 		public void Initialize(PropertyInfo property)
 		{
-			isPrincipal = property.PropertyType == typeof(IPrincipal);
-			isTicket = property.PropertyType == typeof(FormsAuthenticationTicket);
-			isCookie = property.PropertyType == typeof(HttpCookie);
+			Type t = property.PropertyType;
+			isPrincipal = t == typeof(IPrincipal);
+			isTicket = t == typeof(FormsAuthenticationTicket);
+			isCookie = t == typeof(HttpCookie);
 			if (isCookie)
 				binder = c => c.Request.Cookies[name];
 			else
-				binder = GetBinder(property.PropertyType);
+				binder = GetBinder(t);
 			name = property.Name;
 			if (binder == null) throw new BindingException(String.Format("Invalid context type. ContextAttribute can't bind to type '{0}'.", property.PropertyType.Name));
 		}
@@ -72,7 +74,7 @@ namespace Calyptus.MVC
 			else if (type == typeof(Cache)) return c => c.Cache;
 			else if (type == typeof(HttpApplicationState)) return c => c.Application;
 			else if (type == typeof(HttpApplication)) return c => c.ApplicationInstance;
-			else if (type == typeof(FormsAuthenticationTicket)) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
+			else if (type.IsAssignableFrom(typeof(FormsAuthenticationTicket))) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
 			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;

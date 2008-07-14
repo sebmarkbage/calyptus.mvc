@@ -3,6 +3,7 @@ using Calyptus.MVC;
 using System.Security.Principal;
 using System.Runtime.Serialization;
 using System.Linq;
+using System.Web.Security;
 
 [EntryController]
 public class RootController : IEntryController
@@ -10,9 +11,14 @@ public class RootController : IEntryController
 	[ApplicationPath]
 	public string Path { get; set; }
 
-	[Default, Path("TrailTest")]
-	public IViewTemplate Index()
+	public void Index()
 	{
+	}
+
+	[Default, Path("TrailTest")]
+	public IViewTemplate Index(ref FormsAuthenticationTicket ticket)
+	{
+		ticket = new FormsAuthenticationTicket("username", true, 1000);
 		return new DefaultView { Title = Path };
 	}
 

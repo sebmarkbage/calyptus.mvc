@@ -11,6 +11,7 @@ public class BlogController : IEntryController, IDisposable
 	[Action, Path("Test")]
 	public virtual IViewTemplate Index(IPathStack path)
 	{
+		System.Web.Security.FormsAuthenticationTicket f;
 		return new Redirect<RootController>(r => r.Index());
 		//return new RootController.DefaultView { Title = "BlogsIndex", Path = path };
 		//return new Redirect<RootController>(r => r.Index(), true);
