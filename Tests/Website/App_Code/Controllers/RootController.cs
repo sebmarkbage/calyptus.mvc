@@ -11,14 +11,9 @@ public class RootController : IEntryController
 	[ApplicationPath]
 	public string Path { get; set; }
 
-	public void Index()
+	[Default]
+	public IViewTemplate Index()
 	{
-	}
-
-	[Default, Path("TrailTest")]
-	public IViewTemplate Index(ref FormsAuthenticationTicket ticket)
-	{
-		ticket = new FormsAuthenticationTicket("username", true, 1000);
 		return new DefaultView { Title = Path };
 	}
 

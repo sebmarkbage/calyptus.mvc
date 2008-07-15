@@ -6,6 +6,7 @@
     <title>DefaultView</title>
 </head>
 <body>
+	<%= URL(() => new RootController().Index()) %>
 	<h1><%= Data.Title %></h1>
     <p><%= URL<RootController>(r => (r.Blogs() as Blog2Controller).Index2()) %></p>
     <p><a href="<%= URL<RootController>(r => r.Blog("My Test...! " + Data.Title).Edit(10)) %>">Test</a></p>

@@ -80,7 +80,7 @@ namespace Calyptus.MVC
 						sb.Append(Configuration.Config.GetExtension());
 				}
 			}
-			if (TrailingSlash) sb.Append('/');
+			if (TrailingSlash && _path.Length > 0) sb.Append('/');
 
 			if (QueryString.Count > 0)
 			{
