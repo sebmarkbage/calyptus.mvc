@@ -26,6 +26,33 @@ namespace Calyptus.MVC
 			Key = key;
 		}
 
+		private class KeyMapping : IMappingBinding
+		{
+			private string key;
+
+			public KeyMapping(string key)
+			{
+				this.key = key;
+			}
+
+			public bool TryMapping(IHttpContext context, IPathStack path)
+			{
+				string[] actions = context.Request.Form.GetValues("action");
+				if (actions != null)
+					foreach (string action in actions)
+						if (action.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+							return true;
+				return context.Request.Form[key] != null;
+			}
+
+			public void SerializeToPath(IPathStack path) { }
+		}
+
+		protected override void Initialize(System.Reflection.MethodInfo method)
+		{
+			if (Key != null) Mappings.Add(new KeyMapping(Key));
+		}
+
 		protected override void Initialize(System.Reflection.ParameterInfo method)
 		{
 			if (Key == null) Key = method.Name;
@@ -57,6 +84,28 @@ namespace Calyptus.MVC
 		public FormAttribute(string formKey) : this()
 		{
 			Key = formKey;
+		}
+
+		private class KeyMapping : IMappingBinding
+		{
+			private string key;
+
+			public KeyMapping(string key)
+			{
+				this.key = key;
+			}
+
+			public bool TryMapping(IHttpContext context, IPathStack path)
+			{
+				string[] actions = context.Request.Form.GetValues("action");
+				if (actions != null)
+					foreach (string action in actions)
+						if (action.Equals(key, StringComparison.InvariantCultureIgnoreCase))
+							return true;
+				return context.Request.Form[key] != null;
+			}
+
+			public void SerializeToPath(IPathStack path) { }
 		}
 
 		protected override void Initialize(System.Reflection.ParameterInfo method)
