@@ -12,6 +12,9 @@
     <AssemblyName>Calyptus.MVC</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Calyptus.MVC.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>Calyptus.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -137,6 +140,12 @@
     </Compile>
     <Compile Include="Http\HttpContextWrapper.cs" />
     <Compile Include="ViewTemplates\IViewTemplate.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Calyptus.MVC.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Calyptus.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
