@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Calyptus.MVC.Mapping;
 
-namespace Calyptus.MVC.Binding.Attributes
+namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
 	public class PutAttribute : BinderBaseAttribute
