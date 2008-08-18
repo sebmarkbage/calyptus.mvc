@@ -268,6 +268,8 @@ namespace Calyptus.MVC
 
 		protected virtual void OnRender(IHttpContext context, object value)
 		{
+			if (_returnType == typeof(void)) return;
+
 			if (ResponseType != null) context.Response.ContentType = ResponseType;
 
 			IViewTemplate template = value as IViewTemplate;

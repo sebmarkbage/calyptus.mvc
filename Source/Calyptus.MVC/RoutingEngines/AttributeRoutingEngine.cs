@@ -65,7 +65,17 @@ namespace Calyptus.MVC
 			List<IEntryControllerBinding> controllers = new List<IEntryControllerBinding>();
 
 			foreach (Assembly a in assemblies)
-				foreach (Type t in a.GetTypes())
+			{
+				Type[] types;
+				try
+				{
+					types = a.GetTypes();
+				}
+				catch
+				{
+					continue;
+				}
+				foreach (Type t in types)
 				{
 					if (t.GetCustomAttributes(typeof(IEntryControllerBinding), false).Length > 0)
 					{
@@ -78,7 +88,7 @@ namespace Calyptus.MVC
 							}
 					}
 				}
-
+			}
 			_controllers = controllers.ToArray();
 		}
 
