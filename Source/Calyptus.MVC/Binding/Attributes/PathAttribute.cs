@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using Calyptus.MVC.Mapping;
+using System.Drawing;
 
 namespace Calyptus.MVC
 {
@@ -25,6 +26,8 @@ namespace Calyptus.MVC
 
 		private string _pathResBaseName;
 		private string _pathResKey;
+
+		public string Extension { get; set; }
 
 		public PathAttribute()
 		{
@@ -145,7 +148,17 @@ namespace Calyptus.MVC
 			{
 				try
 				{
-					obj = Convert.ChangeType(path.Peek(), BindingTargetType, System.Globalization.CultureInfo.InvariantCulture);
+					string nextPath = path.Peek();
+					if (Extension != null)
+					{
+						if (!nextPath.EndsWith(Extension, StringComparison.CurrentCultureIgnoreCase))
+						{
+							obj = null;
+							return false;
+						}
+						nextPath = nextPath.Substring(0, nextPath.Length - Extension.Length);
+					}
+					obj = ConvertFromPath(nextPath, BindingTargetType);
 					path.Pop();
 					return true;
 				}
@@ -178,13 +191,46 @@ namespace Calyptus.MVC
 			{
 				try
 				{
-					path.Push(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture));
+					path.Push(ConvertToPath(value) + Extension);
 				}
 				catch (Exception e)
 				{
 					throw new BindingException(e.Message, e);
 				}
 			}
+		}
+
+		private string ConvertToPath(object value)
+		{
+			if (value is byte[])
+				return Convert.ToBase64String((byte[])value, Base64FormattingOptions.None).Replace('+', '-').Replace('/', '_').Replace("=", "");
+			else if (value is Size)
+			{
+				Size s = (Size)value;
+				return s.Width.ToString() + "x" + s.Height.ToString();
+			}
+			else
+				return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
+		}
+
+		private object ConvertFromPath(string path, Type targetType)
+		{
+			if (targetType == typeof(byte[]))
+			{
+				string p = path.Replace('-', '+').Replace('_', '/');
+				int i = p.Length % 4;
+				if (i > 0)
+					p = p.PadRight(4 - i, '=');
+				return Convert.FromBase64String(p);
+			}
+			else if (targetType == typeof(Size))
+			{
+				string[] s = path.Split(new char[] { 'x' }, 2);
+				if (s.Length != 2) throw new Exception("Wrong format");
+				return new Size(int.Parse(s[0]), int.Parse(s[1]));
+			}
+			else
+				return Convert.ChangeType(path, BindingTargetType, System.Globalization.CultureInfo.InvariantCulture);
 		}
 	}
 }

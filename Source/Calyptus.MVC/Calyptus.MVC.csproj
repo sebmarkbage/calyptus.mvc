@@ -39,6 +39,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -58,6 +59,7 @@
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
     <Compile Include="Binding\Attributes\ApplicationPathAttribute.cs" />
     <Compile Include="Binding\Attributes\ApplicationFilePathAttribute.cs" />
+    <Compile Include="Binding\Attributes\HeaderAttribute.cs" />
     <Compile Include="Binding\Attributes\MapPathAttribute.cs" />
     <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
     <Compile Include="Binding\Attributes\RequestAttribute.cs" />
