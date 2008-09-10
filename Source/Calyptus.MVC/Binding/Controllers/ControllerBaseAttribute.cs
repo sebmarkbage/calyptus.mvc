@@ -17,7 +17,17 @@ namespace Calyptus.MVC
 
 		public virtual void Initialize(Type controllerType)
 		{
-			_controllerCreator = () => System.Activator.CreateInstance(controllerType);
+			_controllerCreator = () =>
+			{
+				try
+				{
+					return System.Activator.CreateInstance(controllerType);
+				}
+				catch (TargetInvocationException ex)
+				{
+					throw ex.InnerException;
+				}
+			};
 
 			PropertyHandler[] properties;
 			List<PropertyHandler> props = new List<PropertyHandler>();
