@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Web;
 using System.Web.SessionState;
 using System.Collections.Specialized;
@@ -17,6 +18,19 @@ namespace Calyptus.MVC
 
 		public virtual void Initialize(Type controllerType)
 		{
+			ConstructorInfo constructor = controllerType.GetConstructor(Type.EmptyTypes);
+
+			if (constructor != null)
+			{
+				DynamicMethod inv = new DynamicMethod("CreateController", typeof(object), Type.EmptyTypes);
+				ILGenerator invIL = inv.GetILGenerator();
+				invIL.Emit(OpCodes.Newobj, constructor);
+				invIL.Emit(OpCodes.Ret);
+
+				_controllerCreator = (Func<object>)inv.CreateDelegate(typeof(Func<object>));
+			}
+			//throw new BindingException("Controller " + controllerType.Name + " doesn't contain a public no-arguments constructor.");
+			/*
 			_controllerCreator = () =>
 			{
 				try
@@ -27,7 +41,7 @@ namespace Calyptus.MVC
 				{
 					throw ex.InnerException;
 				}
-			};
+			};*/
 
 			PropertyHandler[] properties;
 			List<PropertyHandler> props = new List<PropertyHandler>();

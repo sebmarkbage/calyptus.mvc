@@ -84,9 +84,18 @@ namespace Calyptus.MVC
 			}
 		}
 
+		protected override void OnPreInit(EventArgs e)
+		{
+			base.OnPreInit(e);
+
+			WebFormsViewFactory.InitMasterRecursively(this, _template);
+		}
+
+		private IViewTemplate _template;
+
 		internal virtual void SetTemplate(IViewTemplate template)
 		{
-			
+			_template = template;
 		}
 
 		public void Render(Stream stream)
@@ -103,13 +112,16 @@ namespace Calyptus.MVC
 
     public class ViewPage<TTemplate> : ViewPage, IView<TTemplate> where TTemplate : class, IViewTemplate
     {
-		public TTemplate Data { get; set; }
+		private TTemplate _data;
 
-		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+		public TTemplate Data { get { return _data; } }
+
+		TTemplate IView<TTemplate>.Template { get { return _data; } set { SetTemplate(value); } }
 
 		internal override void SetTemplate(IViewTemplate template)
 		{
-			Data = (TTemplate)template;
+			_data = ((TTemplate)template);
+			base.SetTemplate(template);
 		}
 	}
 

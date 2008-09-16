@@ -17,17 +17,20 @@ namespace Calyptus.MVC
 			IView view = GetPageInstance(template);
 			if (view == null) return null;
 
-			IView v = view;
-			IViewTemplate m = GetMasterOf(template);
+			return view;
+		}
+
+		internal static void InitMasterRecursively(IView v, IViewTemplate t)
+		{
+			IViewTemplate m = GetMasterOf(t);
 			while (m != null)
 			{
 				v = GetMasterInstance(m, v);
 				m = GetMasterOf(m);
 			}
-			return view;
 		}
 
-		private IViewTemplate GetMasterOf(IViewTemplate t)
+		private static IViewTemplate GetMasterOf(IViewTemplate t)
 		{
 			if (t == null) return null;
 			PropertyInfo p = t.GetType().GetProperty("Master");
@@ -35,7 +38,7 @@ namespace Calyptus.MVC
 			return (IViewTemplate)p.GetValue(t, null);
 		}
 
-		private VirtualPathProvider virtualPath
+		private static VirtualPathProvider virtualPath
 		{
 			get
 			{
@@ -43,17 +46,17 @@ namespace Calyptus.MVC
 			}
 		}
 
-		private Type GetPageType(Type t)
+		private static Type GetPageType(Type t)
 		{
 			return GetType(t, typeof(ViewPage<>).MakeGenericType(t), "~/Views/{0}.aspx");
 		}
 
-		private Type GetControlType(Type t)
+		private static Type GetControlType(Type t)
 		{
 			return GetType(t, new Type[] { typeof(ViewPage<>).MakeGenericType(t), typeof(ViewControl<>).MakeGenericType(t) }, new string[] { "~/Views/{0}.aspx", "~/Views/{0}.ascx" });
 		}
 
-		private string GetMasterType(Type t)
+		private static string GetMasterType(Type t)
 		{
 			Type ofType = typeof(ViewMaster<>).MakeGenericType(t);
 			string pattern = "~/Views/{0}.master";
@@ -70,12 +73,12 @@ namespace Calyptus.MVC
 			return null;
 		}
 
-		private Type GetType(Type template, Type validType, params string[] filePatterns)
+		private static Type GetType(Type template, Type validType, params string[] filePatterns)
 		{
 			return GetType(template, new Type[] { validType }, filePatterns);
 		}
 
-		private Type GetType(Type template, Type[] validTypes, string[] filePatterns)
+		private static Type GetType(Type template, Type[] validTypes, string[] filePatterns)
 		{
 			foreach (string path in GetPaths(template))
 			{
@@ -94,7 +97,7 @@ namespace Calyptus.MVC
 			return null;
 		}
 
-		private IEnumerable<string> GetPaths(Type t)
+		private static IEnumerable<string> GetPaths(Type t)
 		{
 			string name = t.Name;
 			string fullName = t.FullName;
@@ -151,11 +154,11 @@ namespace Calyptus.MVC
 		}
 
 		#region Cache
-		private Dictionary<Type, Type> _pageTypeCache;
-		private Dictionary<Type, Type> _controlTypeCache;
-		private Dictionary<Type, string> _masterTypeCache;
+		private static Dictionary<Type, Type> _pageTypeCache;
+		private static Dictionary<Type, Type> _controlTypeCache;
+		private static Dictionary<Type, string> _masterTypeCache;
 
-		protected IView GetPageInstance(IViewTemplate template)
+		protected static IView GetPageInstance(IViewTemplate template)
 		{
 			Type templateType = template.GetType();
 			if (_pageTypeCache == null) _pageTypeCache = new Dictionary<Type, Type>();
@@ -179,7 +182,7 @@ namespace Calyptus.MVC
 			}
 		}
 
-		protected IView GetControlInstance(IViewTemplate template)
+		protected static IView GetControlInstance(IViewTemplate template)
 		{
 			Type templateType = template.GetType();
 			if (_controlTypeCache == null) _controlTypeCache = new Dictionary<Type, Type>();
@@ -211,7 +214,7 @@ namespace Calyptus.MVC
 			}
 		}
 
-		protected IView GetMasterInstance(IViewTemplate template, IView parent)
+		protected static IView GetMasterInstance(IViewTemplate template, IView parent)
 		{
 			Type templateType = template.GetType();
 

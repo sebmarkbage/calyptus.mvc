@@ -78,7 +78,6 @@ namespace Calyptus.MVC
 
 		internal virtual void SetTemplate(IViewTemplate template)
 		{
-
 		}
 
 		string IView.ContentType
@@ -100,13 +99,16 @@ namespace Calyptus.MVC
 
 	public abstract class ViewMaster<TTemplate> : ViewMaster, IView<TTemplate> where TTemplate : class, IViewTemplate
     {
-		public TTemplate Data { get; set; }
+		private TTemplate _data;
 
-		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+		public TTemplate Data { get { return _data; } }
+
+		TTemplate IView<TTemplate>.Template { get { return _data; } set { SetTemplate(value); } }
 
 		internal override void SetTemplate(IViewTemplate template)
 		{
-			Data = (TTemplate)template;
+			_data = (TTemplate)template;
+			base.SetTemplate(template);
 		}
 	}
 
@@ -114,11 +116,8 @@ namespace Calyptus.MVC
 		where TTemplate : class, IViewTemplate<TMaster>
 		where TMaster : class, IViewTemplate
 	{
-		public new TTemplate Data { get; set; }
-
 		public void Render(IHttpContext context, TTemplate template)
 		{
-			this.Data = template;
 			throw new NotImplementedException();
 		}
 

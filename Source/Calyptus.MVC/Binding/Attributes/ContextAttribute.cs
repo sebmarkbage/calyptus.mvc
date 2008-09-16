@@ -74,7 +74,18 @@ namespace Calyptus.MVC
 			else if (type == typeof(Cache)) return c => c.Cache;
 			else if (type == typeof(HttpApplicationState)) return c => c.Application;
 			else if (type == typeof(HttpApplication)) return c => c.ApplicationInstance;
-			else if (type == typeof(FormsAuthenticationTicket)) return c => c.Request.Cookies[FormsAuthentication.FormsCookieName] == null ? null : FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
+			else if (type == typeof(FormsAuthenticationTicket)) return c =>
+			{
+				if (c.Request.Cookies[FormsAuthentication.FormsCookieName] == null) return null;
+				try
+				{
+					return FormsAuthentication.Decrypt(c.Request.Cookies[FormsAuthentication.FormsCookieName].Value);
+				}
+				catch (ArgumentException)
+				{
+					return null;
+				}
+			};
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
 			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;
@@ -107,7 +118,7 @@ namespace Calyptus.MVC
 			else if (isCookie) context.Response.SetCookie((HttpCookie)value);
 			else if (isTicket)
 			{
-				if (value == null) context.Response.Cookies.Remove(FormsAuthentication.FormsCookieName);
+				if (value == null) context.Response.SetCookie(new HttpCookie(FormsAuthentication.FormsCookieName));
 				else
 				{
 					HttpCookie cookie = new HttpCookie(FormsAuthentication.FormsCookieName, FormsAuthentication.Encrypt((FormsAuthenticationTicket)value))

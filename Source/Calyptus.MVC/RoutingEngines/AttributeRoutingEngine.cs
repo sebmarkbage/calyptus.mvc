@@ -63,9 +63,11 @@ namespace Calyptus.MVC
         public AttributeRoutingEngine(ICollection assemblies)
         {
 			List<IEntryControllerBinding> controllers = new List<IEntryControllerBinding>();
+			System.Diagnostics.Debug.WriteLine("Init Routing Engine");
 
 			foreach (Assembly a in assemblies)
 			{
+				System.Diagnostics.Debug.WriteLine(a.FullName);
 				Type[] types;
 				try
 				{

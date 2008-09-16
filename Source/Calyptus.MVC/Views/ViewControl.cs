@@ -94,13 +94,16 @@ namespace Calyptus.MVC
 
 	public class ViewControl<TTemplate> : ViewControl, IView<TTemplate> where TTemplate : class, IViewTemplate
 	{
-		public TTemplate Data { get; set; }
+		private TTemplate _data;
 
-		TTemplate IView<TTemplate>.Template { get { return Data; } set { Data = value; } }
+		public TTemplate Data { get { return _data; } }
+
+		TTemplate IView<TTemplate>.Template { get { return _data; } set { SetTemplate(value); } }
 
 		internal override void SetTemplate(IViewTemplate template)
 		{
-			Data = (TTemplate)template;
+			_data = (TTemplate)template;
+			base.SetTemplate(template);
 		}
 	}
 }
