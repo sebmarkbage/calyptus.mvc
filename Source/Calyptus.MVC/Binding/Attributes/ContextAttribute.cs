@@ -89,7 +89,7 @@ namespace Calyptus.MVC
 			else if (type == typeof(IHttpSessionState)) return c => c.Session;
 			else if (type == typeof(ProfileBase)) return c => c.Profile;
 			else if (type == typeof(IPrincipal)) return c => c.User;
-			else if (type == typeof(IIdentity)) return c => c.User.Identity;
+			else if (type == typeof(IIdentity)) return c => c.User == null ? null : c.User.Identity;
 			else if (type == typeof(IHttpContext)) return c => c;
 			else if (type == typeof(IHttpRequest)) return c => c.Request;
 			else if (type == typeof(IHttpResponse)) return c => c.Response;

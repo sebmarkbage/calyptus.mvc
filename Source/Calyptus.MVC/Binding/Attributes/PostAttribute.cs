@@ -69,7 +69,7 @@ namespace Calyptus.MVC
 			if (BindingTargetType == typeof(HttpPostedFile))
 			{
 				HttpPostedFile file = context.Request.Files[Key];
-				if (file.ContentLength > 0)
+				if (file != null && file.ContentLength > 0)
 				{
 					value = file;
 					return true;
@@ -138,7 +138,7 @@ namespace Calyptus.MVC
 			if (BindingTargetType == typeof(HttpPostedFile))
 			{
 				HttpPostedFile file = context.Request.Files[Key];
-				if (file.ContentLength > 0)
+				if (file != null && file.ContentLength > 0)
 				{
 					value = file;
 					return true;

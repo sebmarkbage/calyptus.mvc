@@ -96,12 +96,9 @@ namespace Calyptus.MVC
 			else if (value.GetType() == typeof(double)) overloadWeight = 95;
 			else overloadWeight = 100;
 
-			if (!r && DefaultValue != null)
-			{
-				value = DefaultValue;
-				return true;
-			}
-			return r;
+			if (!r)
+				value = (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null));
+			return true;
 		}
 
 		protected abstract bool TryBinding(IHttpContext context, out object value);
