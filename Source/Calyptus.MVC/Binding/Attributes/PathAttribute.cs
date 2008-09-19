@@ -220,7 +220,7 @@ namespace Calyptus.MVC
 				string p = path.Replace('-', '+').Replace('_', '/');
 				int i = p.Length % 4;
 				if (i > 0)
-					p = p.PadRight(4 - i, '=');
+					p = p.PadRight(p.Length + 4 - i, '=');
 				return Convert.FromBase64String(p);
 			}
 			else if (targetType == typeof(Size))
