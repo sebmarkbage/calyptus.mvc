@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Calyptus.MVC.Mapping;
+using System.Web;
 
 namespace Calyptus.MVC
 {
@@ -65,6 +66,20 @@ namespace Calyptus.MVC
 
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
+			if (BindingTargetType == typeof(HttpPostedFile))
+			{
+				HttpPostedFile file = context.Request.Files[Key];
+				if (file.ContentLength > 0)
+				{
+					value = file;
+					return true;
+				}
+				else
+				{
+					value = null;
+					return false;
+				}
+			}
 			// TODO: JSON, XML, Stream etc.
 			return NameValueSerialization.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
 		}
@@ -120,6 +135,20 @@ namespace Calyptus.MVC
 
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
+			if (BindingTargetType == typeof(HttpPostedFile))
+			{
+				HttpPostedFile file = context.Request.Files[Key];
+				if (file.ContentLength > 0)
+				{
+					value = file;
+					return true;
+				}
+				else
+				{
+					value = null;
+					return false;
+				}
+			}
 			return NameValueSerialization.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
 		}
 	}
