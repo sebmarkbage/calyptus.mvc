@@ -17,6 +17,12 @@ public class RootController : IEntryController
 		return new DefaultView { Title = Path };
 	}
 
+	[Get(Path = "TryBytes", ResponseType="application/json")]
+	public string Get([Path] byte[] bytes)
+	{
+		return Convert.ToBase64String(bytes);
+	}
+
 	[Path("GoToIndex")]
 	public IViewTemplate GoToIndex()
 	{
