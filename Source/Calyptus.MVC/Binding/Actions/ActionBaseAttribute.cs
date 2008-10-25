@@ -13,7 +13,7 @@ using System.Runtime.Serialization.Json;
 using System.Xml.Linq;
 using System.Xml;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public abstract class ActionBaseAttribute : Attribute, IActionBinding
     {

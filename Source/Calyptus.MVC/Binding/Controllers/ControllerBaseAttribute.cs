@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.SessionState;
 using System.Collections.Specialized;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public abstract class ControllerBaseAttribute : Attribute, IControllerBinding
 	{

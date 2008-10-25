@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq.Expressions;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public abstract class RedirectBase : Exception
 	{

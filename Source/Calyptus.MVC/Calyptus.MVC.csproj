@@ -8,8 +8,8 @@
     <ProjectGuid>{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calyptus.MVC</RootNamespace>
-    <AssemblyName>Calyptus.MVC</AssemblyName>
+    <RootNamespace>Calyptus.Mvc</RootNamespace>
+    <AssemblyName>Calyptus.Mvc</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>

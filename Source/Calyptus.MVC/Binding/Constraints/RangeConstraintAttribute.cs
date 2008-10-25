@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple = true, Inherited = false)]
 	public class RangeConstraintAttribute : Attribute, IBindingConstraint

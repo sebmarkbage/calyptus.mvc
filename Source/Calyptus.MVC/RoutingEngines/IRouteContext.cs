@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public interface IRouteContext : IDisposable
 	{

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <?cs
-	using Calyptus.MVC;
+	using Calyptus.Mvc;
 	Blog blog;
 	Post post;
 ?>

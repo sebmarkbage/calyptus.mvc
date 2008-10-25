@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
 	public class CookieAttribute : Attribute, IParameterBinding, IPropertyBinding

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Calyptus.MVC.Mapping;
+using Calyptus.Mvc.Mapping;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public abstract class BinderBaseAttribute : ActionBaseAttribute, IPropertyBinding, IParameterBinding
 	{

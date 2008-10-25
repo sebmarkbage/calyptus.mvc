@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public interface IView : IViewTemplate, IRenderable
 	{

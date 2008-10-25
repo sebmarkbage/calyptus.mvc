@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Calyptus.MVC.Mapping
+namespace Calyptus.Mvc.Mapping
 {
 	public class HeaderMapping : IMappingBinding
 	{

@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Collections;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	internal sealed class HttpResponseWrapper : IHttpResponse
 	{

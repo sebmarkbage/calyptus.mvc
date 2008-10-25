@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter, AllowMultiple = true, Inherited = false)]
 	public class RegExpConstraintAttribute : Attribute, IBindingConstraint

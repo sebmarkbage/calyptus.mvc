@@ -6,7 +6,7 @@ using System.Web.Caching;
 using System.Collections;
 using System.Web.SessionState;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	internal class HttpContextWrapper : IHttpContext
 	{

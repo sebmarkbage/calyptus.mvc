@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public abstract class ViewPage : Page, IView
     {

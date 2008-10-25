@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	internal class PropertyHandler
 	{

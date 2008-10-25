@@ -1,3 +1,3 @@
-﻿public partial class Views_Root_Default : Calyptus.MVC.ViewPage<RootController.DefaultView>
+﻿public partial class Views_Root_Default : Calyptus.Mvc.ViewPage<RootController.DefaultView>
 {
 }

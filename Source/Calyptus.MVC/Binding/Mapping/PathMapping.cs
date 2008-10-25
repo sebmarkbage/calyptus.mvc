@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Globalization;
 using System.Resources;
 
-namespace Calyptus.MVC.Mapping
+namespace Calyptus.Mvc.Mapping
 {
 	public class PathMapping : IMappingBinding
 	{

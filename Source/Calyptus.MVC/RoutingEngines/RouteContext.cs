@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public class RouteContext : IRouteContext
 	{

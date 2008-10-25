@@ -8,7 +8,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public class WebFormsViewFactory : IViewFactory
     {

@@ -10,7 +10,7 @@ using System.Web.Profile;
 using System.Collections.Specialized;
 using System.IO;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public interface IHttpRequest
 	{

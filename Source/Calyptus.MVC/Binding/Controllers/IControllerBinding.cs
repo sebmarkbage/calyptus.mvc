@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	interface IControllerBinding
 	{

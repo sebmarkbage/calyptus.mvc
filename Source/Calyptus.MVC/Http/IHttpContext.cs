@@ -8,7 +8,7 @@ using System.Security.Principal;
 using System.Web.Caching;
 using System.Web.Profile;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public interface IHttpContext : IServiceProvider
 	{

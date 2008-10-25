@@ -1,5 +1,5 @@
 ﻿using System;
-using Calyptus.MVC;
+using Calyptus.Mvc;
 using System.Net;
 using System.IO;
 

@@ -9,7 +9,7 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using Calyptus.MVC;
+using Calyptus.Mvc;
 
 public partial class Views_Blog_Edit : ViewPage<BlogController.EditView, RootController.MasterView>
 {

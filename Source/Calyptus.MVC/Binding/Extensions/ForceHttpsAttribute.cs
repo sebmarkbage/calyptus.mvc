@@ -5,7 +5,7 @@ using System.Text;
 using System.Web;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class ForceHttpsAttribute : Attribute, IExtension

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.SessionState;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public class HttpSessionStateWrapper : IHttpSessionState
 	{

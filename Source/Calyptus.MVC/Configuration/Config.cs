@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Xml;
 using System.Web.Configuration;
 
-namespace Calyptus.MVC.Configuration
+namespace Calyptus.Mvc.Configuration
 {
     public class Config : ConfigurationSection
 	{

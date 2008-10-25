@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public class PathStack : IPathStack
     {

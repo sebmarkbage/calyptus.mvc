@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using Calyptus.MVC;
+using Calyptus.Mvc;
 using System.Web;
-using Calyptus.MVC.Mapping;
+using Calyptus.Mvc.Mapping;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=true, Inherited=false)]
 	public class EntryControllerAttribute : ControllerBaseAttribute, IEntryControllerBinding

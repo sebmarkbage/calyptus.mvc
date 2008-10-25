@@ -6,7 +6,7 @@ using System.Web;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public interface IRoutingEngine
     {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Calyptus.MVC.Mapping;
+using Calyptus.Mvc.Mapping;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
 	public class DeleteAttribute : ActionBaseAttribute

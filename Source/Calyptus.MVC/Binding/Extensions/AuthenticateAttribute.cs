@@ -6,7 +6,7 @@ using System.Web;
 using System.Reflection;
 using System.Web.Security;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class AuthenticateAttribute : Attribute, IExtension

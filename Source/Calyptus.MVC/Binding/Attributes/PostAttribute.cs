@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Calyptus.MVC.Mapping;
+using Calyptus.Mvc.Mapping;
 using System.Web;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.GenericParameter | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
 	public class PostAttribute : BinderBaseAttribute

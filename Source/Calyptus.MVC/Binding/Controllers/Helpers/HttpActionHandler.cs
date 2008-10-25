@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.SessionState;
 using System.Reflection;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	internal class HttpActionHandler : IHttpHandler, IRequiresSessionState
 	{

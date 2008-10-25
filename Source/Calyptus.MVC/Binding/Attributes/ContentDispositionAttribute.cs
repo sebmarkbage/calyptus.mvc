@@ -11,7 +11,7 @@ using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
 	public class ContentDispositionAttribute : Attribute, IPropertyBinding, IParameterBinding

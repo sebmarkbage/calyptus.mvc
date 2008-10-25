@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Web.UI;
 using System.Linq.Expressions;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public abstract class ViewMaster : MasterPage, IView
     {

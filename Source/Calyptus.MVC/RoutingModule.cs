@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Reflection;
-using Calyptus.MVC.Configuration;
+using Calyptus.Mvc.Configuration;
 using System.Web.Configuration;
 using System.Configuration;
 using System.Collections;
 using System.IO;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     public class RoutingModule : IHttpModule
     {
@@ -75,7 +75,7 @@ namespace Calyptus.MVC
 			if (handler != null)
 			{
 				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path, Route = route };
-				context.RewritePath("~/Calyptus.MVC.axd");
+				context.RewritePath("~/Calyptus.Mvc.axd");
 			}
 			else
 				route.Dispose();

@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	public static class SerializationHelper
 	{

@@ -9,7 +9,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
-using Calyptus.MVC;
+using Calyptus.Mvc;
 
 public class Blog2Controller : BlogController
 {

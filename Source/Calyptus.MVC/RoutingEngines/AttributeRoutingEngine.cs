@@ -5,10 +5,10 @@ using System.Text;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Web;
-using Calyptus.MVC;
+using Calyptus.Mvc;
 using System.Collections;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
     internal class AttributeRoutingEngine : IRoutingEngine
     {

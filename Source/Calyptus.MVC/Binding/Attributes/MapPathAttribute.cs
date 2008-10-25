@@ -8,7 +8,7 @@ using System.Web.Caching;
 using System.IO;
 using System.Xml;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
 	public class MapPathAttribute : Attribute, IPropertyBinding, IParameterBinding

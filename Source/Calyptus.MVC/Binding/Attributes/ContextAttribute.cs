@@ -10,7 +10,7 @@ using System.Xml;
 using System.Web.Profile;
 using System.Web.Security;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
 	public class ContextAttribute : Attribute, IPropertyBinding, IParameterBinding

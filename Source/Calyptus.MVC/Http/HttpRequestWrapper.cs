@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.Collections.Specialized;
 using System.IO;
 
-namespace Calyptus.MVC
+namespace Calyptus.Mvc
 {
 	internal class HttpRequestWrapper : IHttpRequest
 	{
