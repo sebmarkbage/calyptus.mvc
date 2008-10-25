@@ -11,16 +11,10 @@ using System.Xml;
 namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-	public class HeaderAttribute : Attribute, IPropertyBinding, IParameterBinding
+	public class ContentTypeAttribute : Attribute, IPropertyBinding, IParameterBinding
 	{
-		public string Key { get; set; }
-
-		public HeaderAttribute()
+		public ContentTypeAttribute()
 		{
-		}
-		public HeaderAttribute(string key)
-		{
-			this.Key = key;
 		}
 
 		private Type bindingType;
@@ -40,19 +34,19 @@ namespace Calyptus.MVC
 		public bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
 		{
 			overloadWeight = 0;
-			return SerializationHelper.TryDeserialize(context.Request.Headers[Key], bindingType, out obj);
+			return SerializationHelper.TryDeserialize(context.Request.ContentType, bindingType, out obj);
 		}
 
 		public bool TryBinding(IHttpContext context, out object obj)
 		{
-			return SerializationHelper.TryDeserialize(context.Request.Headers[Key], bindingType, out obj);
+			return SerializationHelper.TryDeserialize(context.Request.ContentType, bindingType, out obj);
 		}
 
 		public void StoreBinding(IHttpContext context, object value)
 		{
 			string v = SerializationHelper.Serialize(value);
 			if (v != null)
-				context.Response.AppendHeader(Key, v);
+				context.Response.ContentType = v;
 		}
 
 		public void SerializePath(IPathStack path, object value)

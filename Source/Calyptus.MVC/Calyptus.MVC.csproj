@@ -59,6 +59,10 @@
     <Compile Include="Binding\Attributes\CookieAttribute.cs" />
     <Compile Include="Binding\Attributes\ApplicationPathAttribute.cs" />
     <Compile Include="Binding\Attributes\ApplicationFilePathAttribute.cs" />
+    <Compile Include="Binding\Attributes\ContentTypeAttribute.cs" />
+    <Compile Include="Binding\Attributes\ContentDispositionAttribute.cs" />
+    <Compile Include="Binding\Attributes\ETagAttribute.cs" />
+    <Compile Include="Binding\Attributes\HeadAttribute.cs" />
     <Compile Include="Binding\Attributes\HeaderAttribute.cs" />
     <Compile Include="Binding\Attributes\MapPathAttribute.cs" />
     <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
@@ -107,6 +111,7 @@
     <Compile Include="RoutingEngines\SiteMapView.cs" />
     <Compile Include="RoutingEngines\RouteTree.cs" />
     <Compile Include="ViewFactories\ViewFactoryBase.cs" />
+    <Compile Include="Views\NotChanged.cs" />
     <Compile Include="Views\Redirect.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Binding\Extensions\IExtension.cs" />

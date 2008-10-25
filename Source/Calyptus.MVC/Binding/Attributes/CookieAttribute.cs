@@ -38,7 +38,7 @@ namespace Calyptus.MVC
 		public void Initialize(ParameterInfo parameter)
 		{
 			_type = parameter.ParameterType;
-			_complexType = NameValueSerialization.IsComplexType(_type);
+			_complexType = SerializationHelper.IsComplexType(_type);
 			MethodInfo m = (MethodInfo)parameter.Member;
 			Type c = m.DeclaringType;
 			if (_name == null) _name = "MvcBinding." + c.Namespace + "." + c.Name + "." + m.Name + "(" + parameter.Name + ")";
@@ -46,7 +46,7 @@ namespace Calyptus.MVC
 		public void Initialize(PropertyInfo property)
 		{
 			_type = property.PropertyType;
-			_complexType = NameValueSerialization.IsComplexType(_type);
+			_complexType = SerializationHelper.IsComplexType(_type);
 			Type c = property.DeclaringType;
 			if (_name == null) _name = "MvcBinding." + c.Namespace + "." + c.Name + "." + property.Name;
 		}
@@ -68,26 +68,15 @@ namespace Calyptus.MVC
 			{
 				System.Web.UI.LosFormatter formatter = new System.Web.UI.LosFormatter();
 				obj = formatter.Deserialize(cookie.Value);
+				return obj != null && obj.GetType().IsAssignableFrom(this._type);
 			}
 			else
 			{
 				if (!_complexType)
-				{
-					try
-					{
-						obj = Convert.ChangeType(cookie.Value, _type, System.Globalization.CultureInfo.InvariantCulture);
-					}
-					catch
-					{
-						obj = null;
-					}
-				}
+					return SerializationHelper.TryDeserialize(cookie.Value, _type, out obj);
 				else
-				{
-					throw new NotImplementedException();
-				}
+					return SerializationHelper.TryDeserialize(cookie.Values, null, _type, out obj);
 			}
-			return obj != null && obj.GetType().IsAssignableFrom(this._type);
 		}
 
 		public bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
@@ -127,20 +116,9 @@ namespace Calyptus.MVC
 				else
 				{
 					if (!_complexType)
-					{
-						try
-						{
-							cookie.Value = Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
-						}
-						catch(Exception e)
-						{
-							throw new BindingException(e.Message, e);
-						}
-					}
+						cookie.Value = SerializationHelper.Serialize(value);
 					else
-					{
-						throw new NotImplementedException();
-					}
+						SerializationHelper.Serialize(value, cookie.Values, null);
 				}
 			}
 			if (cookie == null)

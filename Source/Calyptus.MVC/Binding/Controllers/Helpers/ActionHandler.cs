@@ -117,6 +117,7 @@ namespace Calyptus.MVC
 			}
 			catch (Exception e)
 			{
+				if (returnValue is IDisposable) ((IDisposable)returnValue).Dispose();
 				returnValue = HandleException(context, e);
 				if (returnValue == null) throw;
 			}

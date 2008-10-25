@@ -60,12 +60,12 @@ namespace Calyptus.MVC
 
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
-			return NameValueSerialization.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value);
+			return SerializationHelper.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value);
 		}
 
 		protected override void SerializePath(IPathStack path, object value)
 		{
-			NameValueSerialization.Serialize(path.QueryString, Key, value);
+			SerializationHelper.Serialize(value, path.QueryString, Key);
 		}
 	}
 

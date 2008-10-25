@@ -11,48 +11,47 @@ using System.Xml;
 namespace Calyptus.MVC
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-	public class HeaderAttribute : Attribute, IPropertyBinding, IParameterBinding
+	public class ETagAttribute : Attribute, IPropertyBinding, IParameterBinding
 	{
-		public string Key { get; set; }
-
-		public HeaderAttribute()
+		public ETagAttribute()
 		{
-		}
-		public HeaderAttribute(string key)
-		{
-			this.Key = key;
 		}
 
 		private Type bindingType;
 
 		public void Initialize(ParameterInfo parameter)
 		{
-			bindingType = parameter.ParameterType.IsByRef ? parameter.ParameterType.GetElementType() : parameter.ParameterType;
-			//if (bindingType != typeof(string)) throw new BindingException(String.Format("Invalid path type. {1} can't bind to type '{0}'. Try using string.", parameter.ParameterType.Name, GetType().Name));
+			if (!parameter.ParameterType.IsByRef) throw new BindingException("ETag can only bind to ByRef parameters. Try using out-prefix in C#.");
+			bindingType = parameter.ParameterType.GetElementType();
 		}
 
 		public void Initialize(PropertyInfo property)
 		{
+			if (!property.CanRead) throw new BindingException("ETag can only bind to readable properties.");
 			bindingType = property.PropertyType;
-			//if (bindingType != typeof(string)) throw new BindingException(String.Format("Invalid path type. {1} can't bind to type '{0}'. Try using string", property.PropertyType.Name, GetType().Name));
 		}
 
 		public bool TryBinding(IHttpContext context, IPathStack path, out object obj, out int overloadWeight)
 		{
 			overloadWeight = 0;
-			return SerializationHelper.TryDeserialize(context.Request.Headers[Key], bindingType, out obj);
+			obj = bindingType.IsValueType ? System.Activator.CreateInstance(bindingType) : null;
+			return true;
 		}
 
 		public bool TryBinding(IHttpContext context, out object obj)
 		{
-			return SerializationHelper.TryDeserialize(context.Request.Headers[Key], bindingType, out obj);
+			obj = null;
+			return false;
 		}
 
 		public void StoreBinding(IHttpContext context, object value)
 		{
 			string v = SerializationHelper.Serialize(value);
 			if (v != null)
-				context.Response.AppendHeader(Key, v);
+			{
+				if (v.Equals(context.Request.Headers["If-None-Match"])) throw new NotChanged();
+				context.Response.AppendHeader("ETag", v);
+			}
 		}
 
 		public void SerializePath(IPathStack path, object value)

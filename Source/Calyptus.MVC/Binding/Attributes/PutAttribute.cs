@@ -39,7 +39,7 @@ namespace Calyptus.MVC
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
 			// TODO: JSON, XML, Stream etc.
-			return NameValueSerialization.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
+			return SerializationHelper.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
 		}
 	}
 }

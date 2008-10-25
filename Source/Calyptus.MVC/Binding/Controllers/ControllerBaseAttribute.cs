@@ -12,6 +12,8 @@ namespace Calyptus.MVC
 {
 	public abstract class ControllerBaseAttribute : Attribute, IControllerBinding
 	{
+		public bool DisableTrailingSlash { get; set; }
+
 		private ActionHandler[] _handlers;
 
 		private Func<object> _controllerCreator;
@@ -177,7 +179,7 @@ namespace Calyptus.MVC
 			}
 
 			// shouldTrailSlash = bestIndex == index; I.e. the best mapping hasn't used a path
-			if (bestIndex == index ^ path.TrailingSlash && !(bestHandler is ParentActionHandler) && context.Request.HttpMethod == "GET")
+			if (bestIndex == index ^ path.TrailingSlash ^ DisableTrailingSlash && !(bestHandler is ParentActionHandler) && context.Request.HttpMethod == "GET")
 			{
 				// TODO: Make more efficient by simply extracting the final path section and use relative redirect: ../pathsection or ./pathsection/
 				IPathStack newPath = new PathStack(false);
@@ -215,7 +217,7 @@ namespace Calyptus.MVC
 					if (action.ChildAction != null)
 						if (!(handler is ParentActionHandler)) throw new BindingException("Method \"{0}\" is not a parent action and can't handle further calls.");
 
-					if (trialStack.Index == 0) trialStack.TrailingSlash = true;
+					if (trialStack.Index == 0) trialStack.TrailingSlash = !DisableTrailingSlash;
 
 					if (bestStack == null || trialStack.Index > bestStack.Index || (trialStack.Index == bestStack.Index && trialStack.QueryString.Count > bestStack.QueryString.Count))
 						bestStack = trialStack;
