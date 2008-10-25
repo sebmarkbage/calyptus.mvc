@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Calyptus.MVC.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Calyptus.Mvc.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>Calyptus.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -150,7 +150,7 @@
     <Compile Include="ViewTemplates\IViewTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Calyptus.MVC.snk" />
+    <None Include="Calyptus.Mvc.snk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Calyptus.ico" />

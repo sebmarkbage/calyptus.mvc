@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calyptus.MVC", "Source\Calyptus.MVC\Calyptus.MVC.csproj", "{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calyptus.Mvc", "Source\Calyptus.Mvc\Calyptus.Mvc.csproj", "{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Website", "Tests\Website\", "{F62EEA8A-8E5A-4D0F-A172-BD85FE78E4A6}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFramework = "3.5"
-		ProjectReferences = "{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}|Calyptus.MVC.dll;"
+		ProjectReferences = "{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}|Calyptus.Mvc.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/Website"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Tests\Website\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Website\"
