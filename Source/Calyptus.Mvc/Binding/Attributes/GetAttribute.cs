@@ -60,7 +60,9 @@ namespace Calyptus.Mvc
 
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
-			return SerializationHelper.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value);
+			if (SerializationHelper.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value))
+				return Optional ? true : value != null;
+			return false;
 		}
 
 		protected override void SerializePath(IPathStack path, object value)

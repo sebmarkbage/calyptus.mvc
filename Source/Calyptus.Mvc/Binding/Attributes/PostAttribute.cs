@@ -81,7 +81,9 @@ namespace Calyptus.Mvc
 				}
 			}
 			// TODO: JSON, XML, Stream etc.
-			return SerializationHelper.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
+			if (SerializationHelper.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value))
+				return Optional ? true : value != null;
+			return false;
 		}
 	}
 
@@ -149,7 +151,9 @@ namespace Calyptus.Mvc
 					return false;
 				}
 			}
-			return SerializationHelper.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value);
+			if (SerializationHelper.TryDeserialize(context.Request.Form, Key, BindingTargetType, out value))
+				return Optional ? true : value != null;
+			return false;
 		}
 	}
 }

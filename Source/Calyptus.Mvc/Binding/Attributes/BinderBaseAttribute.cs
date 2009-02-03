@@ -22,6 +22,8 @@ namespace Calyptus.Mvc
 		protected bool IsOut { get; private set; }
 		protected bool IsIn { get; private set; }
 
+		public bool Optional { get; set; }
+
 		protected override Type DefaultParameterBinderType
 		{
 			get
@@ -97,7 +99,10 @@ namespace Calyptus.Mvc
 			else overloadWeight = 100;
 
 			if (!r)
+			{
 				value = (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null));
+				return Optional;
+			}
 			return true;
 		}
 
