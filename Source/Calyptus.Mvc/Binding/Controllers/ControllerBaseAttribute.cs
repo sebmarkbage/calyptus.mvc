@@ -185,6 +185,7 @@ namespace Calyptus.Mvc
 				IPathStack newPath = new PathStack(false);
 				newPath.Push(path);
 				newPath.TrailingSlash = !path.TrailingSlash;
+				context.Route.Dispose();
 				context.Response.Redirect("~/" + newPath.ToString(), false);
 				context.Response.StatusCode = 301;
 				context.Response.End();
