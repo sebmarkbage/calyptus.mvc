@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,9 +12,9 @@
     <AssemblyName>Calyptus.Mvc</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>../Calyptus.ico</ApplicationIcon>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Calyptus.Mvc.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>Calyptus.ico</ApplicationIcon>
+    <AssemblyOriginatorKeyFile>../Calyptus.Mvc.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,106 +54,73 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binding\Actions\ActionAttribute.cs" />
-    <Compile Include="Binding\Actions\ActionBaseAttribute.cs" />
-    <Compile Include="Binding\Attributes\CookieAttribute.cs" />
-    <Compile Include="Binding\Attributes\ApplicationPathAttribute.cs" />
-    <Compile Include="Binding\Attributes\ApplicationFilePathAttribute.cs" />
-    <Compile Include="Binding\Attributes\ContentTypeAttribute.cs" />
-    <Compile Include="Binding\Attributes\ContentDispositionAttribute.cs" />
-    <Compile Include="Binding\Attributes\ETagAttribute.cs" />
-    <Compile Include="Binding\Attributes\HeadAttribute.cs" />
-    <Compile Include="Binding\Attributes\HeaderAttribute.cs" />
-    <Compile Include="Binding\Attributes\MapPathAttribute.cs" />
-    <Compile Include="Binding\Attributes\ResponseAttribute.cs" />
-    <Compile Include="Binding\Attributes\RequestAttribute.cs" />
-    <Compile Include="Binding\Attributes\DefaultAttribute.cs" />
-    <Compile Include="Binding\Attributes\BinderBaseAttribute.cs" />
-    <Compile Include="Binding\Attributes\DeleteAttribute.cs" />
-    <Compile Include="Binding\Attributes\PutAttribute.cs" />
-    <Compile Include="Binding\BindingException.cs" />
-    <Compile Include="Binding\Constraints\IBindingConstraint.cs" />
-    <Compile Include="Binding\Constraints\RangeConstraintAttribute.cs" />
-    <Compile Include="Binding\Constraints\RegExpConstraintAttribute.cs" />
-    <Compile Include="Binding\Controllers\Helpers\HttpActionHandler.cs" />
-    <Compile Include="Binding\Controllers\Helpers\ActionHandler.cs" />
-    <Compile Include="Binding\Controllers\IControllerBinding.cs" />
-    <Compile Include="Binding\Attributes\ContextAttribute.cs" />
-    <Compile Include="Binding\Controllers\ControllerAttribute.cs" />
-    <Compile Include="Binding\EventArgs\EventArgs.cs" />
-    <Compile Include="Binding\Extensions\AuthenticateAttribute.cs" />
-    <Compile Include="Binding\Extensions\RequiredRefererAttribute.cs" />
-    <Compile Include="Binding\Extensions\ForceHostAttribute.cs" />
-    <Compile Include="Binding\Extensions\ForceHttpsAttribute.cs" />
-    <Compile Include="Binding\Mapping\ContentTypeMapping.cs" />
-    <Compile Include="Binding\Mapping\HeaderMapping.cs" />
-    <Compile Include="Binding\Mapping\ResourcePathMapping.cs" />
-    <Compile Include="Binding\Mapping\VerbMapping.cs" />
-    <Compile Include="Binding\Controllers\EntryControllerAttribute.cs" />
-    <Compile Include="Binding\Controllers\ControllerBaseAttribute.cs" />
-    <Compile Include="Binding\Attributes\GetAttribute.cs" />
-    <Compile Include="Binding\Actions\IActionBinding.cs" />
-    <Compile Include="Binding\Controllers\IEntryControllerBinding.cs" />
-    <Compile Include="Binding\Mapping\PathMapping.cs" />
-    <Compile Include="Binding\Parameters\IParameterBinding.cs" />
-    <Compile Include="Binding\Attributes\PostAttribute.cs" />
-    <Compile Include="Binding\Attributes\SessionAttribute.cs" />
-    <Compile Include="Binding\Extensions\CacheAttribute.cs" />
-    <Compile Include="Binding\Path\IPathSerializable.cs" />
-    <Compile Include="Binding\Attributes\PathAttribute.cs" />
-    <Compile Include="Binding\Properties\IPropertyBinding.cs" />
-    <Compile Include="Controllers\IEntryController.cs" />
-    <Compile Include="Rendering\IRenderable.cs" />
-    <Compile Include="RoutingEngines\IRouteContext.cs" />
-    <Compile Include="RoutingEngines\RouteContext.cs" />
-    <Compile Include="RoutingEngines\IRouteAction.cs" />
-    <Compile Include="RoutingEngines\RouteAction.cs" />
-    <Compile Include="RoutingEngines\SiteMapView.cs" />
-    <Compile Include="RoutingEngines\RouteTree.cs" />
-    <Compile Include="ViewFactories\ViewFactoryBase.cs" />
-    <Compile Include="Views\NotChanged.cs" />
-    <Compile Include="Views\Redirect.cs" />
-    <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Binding\Extensions\IExtension.cs" />
-    <Compile Include="Controllers\IController.cs" />
-    <Compile Include="Helpers\Json.cs" />
-    <Compile Include="Helpers\NameValueSerialization.cs" />
-    <Compile Include="Http\HttpRequestWrapper.cs" />
-    <Compile Include="Http\HttpResponseWrapper.cs" />
-    <Compile Include="Http\HttpSessionStateWrapper.cs" />
+    <Compile Include="Asp\Connection\AspHttpConnection.cs" />
+    <Compile Include="Asp\Connection\AspHttpRequest.cs" />
+    <Compile Include="Asp\Connection\AspHttpResponse.cs" />
+    <Compile Include="Attributes\AttributeMappingConvention.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Http\HttpServerCertificate.cs" />
+    <Compile Include="Http\HttpClientCertificate.cs" />
+    <Compile Include="Http\IHttpConnection.cs" />
+    <Compile Include="Mapping\MappingConvention.cs" />
+    <Compile Include="Mapping\MappingException.cs" />
+    <Compile Include="Mapping\Mappings\ActionBindingBase.cs" />
+    <Compile Include="Mapping\Mappings\MappingResult.cs" />
+    <Compile Include="Mapping\Mappings\ControllerBindingBase.cs" />
+    <Compile Include="Readers\FormReader.cs" />
+    <Compile Include="Readers\MultipartReader.cs" />
+    <Compile Include="Mapping\ResponseBindings\IResponseBinding.cs" />
+    <Compile Include="Mapping\ValueConstraints\IValueConstraint.cs" />
+    <Compile Include="Mapping\MappingContext.cs" />
+    <Compile Include="Generators\IJavaScriptProxyGenerator.cs" />
+    <Compile Include="Mapping\IMappingContext.cs" />
+    <Compile Include="Generators\IHyperLinkGenerator.cs" />
+    <Compile Include="Asp\RouteBindingHttpHandler.cs" />
+    <Compile Include="Readers\RequestStream.cs" />
+    <Compile Include="Testing\HttpConnectionStub.cs" />
+    <Compile Include="Testing\HttpRequestStub.cs" />
+    <Compile Include="Testing\HttpResponseStub.cs" />
+    <Compile Include="Writers\PathWriter.cs" />
+    <Compile Include="_Unsorted\ActionHandler.cs" />
+    <Compile Include="Mapping\Mappings\IInstanceMapping.cs" />
+    <Compile Include="_Unsorted\EventArgs.cs" />
+    <Compile Include="Mapping\RequestConstraints\ContentTypeMapping.cs" />
+    <Compile Include="Mapping\RequestConstraints\HeaderMapping.cs" />
+    <Compile Include="Mapping\RequestConstraints\ResourcePathMapping.cs" />
+    <Compile Include="Mapping\RequestConstraints\VerbMapping.cs" />
+    <Compile Include="Mapping\Mappings\IActionMapping.cs" />
+    <Compile Include="Mapping\Mappings\IEntryMapping.cs" />
+    <Compile Include="Mapping\RequestConstraints\PathMapping.cs" />
+    <Compile Include="Mapping\RequestBindings\IRequestBinding.cs" />
+    <Compile Include="Mapping\RequestBindings\IPathSerializable.cs" />
+    <Compile Include="_Unsorted\IResponse.cs" />
+    <Compile Include="Mapping\Results\IResultBinding.cs" />
+    <Compile Include="_Unsorted\RouteBinding.cs" />
+    <Compile Include="_Unsorted\RouteContextExtensions.cs" />
+    <Compile Include="_Unsorted\NotChanged.cs" />
+    <Compile Include="_Unsorted\Redirect.cs" />
+    <Compile Include="_Unsorted\IExtension.cs" />
+    <Compile Include="Helpers\SerializationHelper.cs" />
     <Compile Include="Http\IHttpResponse.cs" />
     <Compile Include="Http\IHttpRequest.cs" />
-    <Compile Include="Http\IHttpContext.cs" />
-    <Compile Include="Binding\Mapping\IMappingBinding.cs" />
-    <Compile Include="RoutingEngines\AttributeRoutingEngine.cs" />
-    <Compile Include="RoutingEngines\IPathStack.cs" />
-    <Compile Include="RoutingEngines\IRoutingEngine.cs" />
-    <Compile Include="ViewFactories\CompiledViewFactory.cs" />
-    <Compile Include="ViewFactories\MockViewFactory.cs" />
-    <Compile Include="Views\IView.cs" />
-    <Compile Include="ViewFactories\IViewFactory.cs" />
-    <Compile Include="RoutingEngines\PathStack.cs" />
+    <Compile Include="Mapping\RequestConstraints\IRequestConstraint.cs" />
+    <Compile Include="Mapping\IMappingConvention.cs" />
+    <Compile Include="_Unsorted\FakeViewEngine.cs" />
+    <Compile Include="_Unsorted\IView.cs" />
+    <Compile Include="Readers\PathReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RoutingHandler.cs" />
-    <Compile Include="RoutingModule.cs" />
-    <Compile Include="Views\ViewControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
+    <Compile Include="Asp\Routing.cs" />
+    <Compile Include="Asp\WebForms\ViewControl.cs">
     </Compile>
-    <Compile Include="ViewFactories\WebFormsViewFactory.cs" />
-    <Compile Include="Views\ViewMaster.cs">
-      <SubType>ASPXCodeBehind</SubType>
+    <Compile Include="Asp\WebForms\WebFormsViewEngine.cs" />
+    <Compile Include="Asp\WebForms\ViewMaster.cs">
     </Compile>
-    <Compile Include="Views\ViewPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
+    <Compile Include="Asp\WebForms\ViewPage.cs">
     </Compile>
-    <Compile Include="Http\HttpContextWrapper.cs" />
-    <Compile Include="ViewTemplates\IViewTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Calyptus.Mvc.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Calyptus.ico" />
+    <Folder Include="Xml\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

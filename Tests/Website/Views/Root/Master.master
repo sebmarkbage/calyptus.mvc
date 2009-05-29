@@ -1,12 +1,13 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Master.master.cs" Inherits="Masters_Master" %>
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Master.master.cs" Inherits="Masters_Master" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title><%= Data.HeadTitle %></title>
+    <title><%= Data == null ? "null" : Data.HeadTitle %></title>
 </head>
 <body>
+	<h1>Master</h1>
     <div>
         <asp:ContentPlaceHolder id="top" runat="server">
 			Top content

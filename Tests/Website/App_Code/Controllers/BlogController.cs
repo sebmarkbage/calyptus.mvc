@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Calyptus.Mvc;
 using System.Net;
 using System.IO;
+using System.Linq.Expressions;
 
 [Controller]
 public class BlogController : IEntryController, IDisposable
@@ -11,7 +12,6 @@ public class BlogController : IEntryController, IDisposable
 	[Action, Path("Test")]
 	public virtual IViewTemplate Index(IPathStack path)
 	{
-		System.Web.Security.FormsAuthenticationTicket f;
 		return new Redirect<RootController>(r => r.Index());
 		//return new RootController.DefaultView { Title = "BlogsIndex", Path = path };
 		//return new Redirect<RootController>(r => r.Index(), true);
@@ -21,7 +21,14 @@ public class BlogController : IEntryController, IDisposable
 	[Get("Edit")]
 	public IViewTemplate Edit([QueryString] int id)
 	{
-		return new EditView { Master = Master, ID = id, Title = "TEST Title" };
+		return new EditView {
+			Master = Master,
+			ID = id,
+			Title = "TEST Title",
+			ChangeTitle = title => this.Edit(int.Parse(title)),
+			ChangeTitle2 = this.Edit,
+			Save = title => this.BeginSave(0, title, null, null)
+		};
 	}
 
 	private WebRequest _request;
@@ -53,6 +60,9 @@ public class BlogController : IEntryController, IDisposable
 		public int ID;
 		public string Title;
 		public RootController.MasterView Master { get; set; }
+		public Expression<Action<string>> ChangeTitle { get; set; }
+		public Expression<Action<int>> ChangeTitle2 { get; set; }
+		public Expression<Action<string>> Save { get; set; }
 	}
 
 	#endregion

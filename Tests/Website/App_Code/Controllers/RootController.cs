@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using Calyptus.Mvc;
 using System.Security.Principal;
 using System.Runtime.Serialization;
 using System.Linq;
-using System.Web.Security;
 
 [EntryController]
 public class RootController : IEntryController
@@ -11,16 +10,10 @@ public class RootController : IEntryController
 	[ApplicationPath]
 	public string Path { get; set; }
 
-	[Default]
+	[Default, Path("TrailTest")]
 	public IViewTemplate Index()
 	{
 		return new DefaultView { Title = Path };
-	}
-
-	[Get(Path = "TryBytes", ResponseType="application/json")]
-	public string Get([Path] byte[] bytes)
-	{
-		return Convert.ToBase64String(bytes);
 	}
 
 	[Path("GoToIndex")]
@@ -42,12 +35,6 @@ public class RootController : IEntryController
 
 	// obj.id=10&obj.name=Name
 	// 
-
-	[Post(Path="postTest")]
-	public IViewTemplate Save([Form] string text, [QueryString("ReturnUrl")] string q)
-	{
-		return new DefaultView { Title = text + (q == null ? "null" : "-" + q + "-") };
-	}
 
 	[Post]
 	public void Save([Form] TestObject obj, [Get] int id)

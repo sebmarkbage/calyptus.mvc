@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calyptus.Mvc", "Source\Calyptus.Mvc\Calyptus.Mvc.csproj", "{4E573226-0A93-4AE8-9D8F-7CA255FDC5F6}"
@@ -21,10 +21,21 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Website", "Tests\Website\",
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "64685"
+		VWDPort = "49384"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calyptus.Mvc.Tests", "Tests\Calyptus.Mvc.Tests\Calyptus.Mvc.Tests.csproj", "{A65453C9-C874-401C-BF65-CBFB9CAF87A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{18171137-0F07-4586-9E2B-8EA2462B8533}"
+	ProjectSection(SolutionItems) = preProject
+		Calyptus.Mvc.vsmdi = Calyptus.Mvc.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Calyptus.Mvc.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|.NET = Debug|.NET
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +65,16 @@ Global
 		{F62EEA8A-8E5A-4D0F-A172-BD85FE78E4A6}.Release|Any CPU.ActiveCfg = Debug|.NET
 		{F62EEA8A-8E5A-4D0F-A172-BD85FE78E4A6}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
 		{F62EEA8A-8E5A-4D0F-A172-BD85FE78E4A6}.Release|Mixed Platforms.Build.0 = Debug|.NET
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Release|.NET.ActiveCfg = Release|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A65453C9-C874-401C-BF65-CBFB9CAF87A7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

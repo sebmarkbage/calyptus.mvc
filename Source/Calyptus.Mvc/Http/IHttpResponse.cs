@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -14,62 +14,12 @@ namespace Calyptus.Mvc
 {
 	public interface IHttpResponse
 	{
-		void AddCacheDependency(params CacheDependency[] dependencies);
-		void AddCacheItemDependencies(ArrayList cacheKeys);
-		void AddCacheItemDependencies(string[] cacheKeys);
-		void AddCacheItemDependency(string cacheKey);
-		void AddFileDependencies(ArrayList filenames);
-		void AddFileDependencies(string[] filenames);
-		void AddFileDependency(string filename);
-		void AppendCookie(HttpCookie cookie);
-		void AppendHeader(string name, string value);
-		void AppendToLog(string param);
-		string ApplyAppPathModifier(string virtualPath);
-		void BinaryWrite(byte[] buffer);
-		void Clear();
-		void ClearContent();
-		void ClearHeaders();
-		void DisableKernelCache();
-		void End();
-		void Flush();
-		void Pics(string value);
-		void Redirect(string url);
-		void Redirect(string url, bool endResponse);
-		void SetCookie(HttpCookie cookie);
-		void TransmitFile(string filename);
-		void TransmitFile(string filename, long offset, long length);
-		void Write(object obj);
-		void Write(string s);
-		void Write(char[] buffer, int index, int count);
-		void WriteFile(string filename);
-		void WriteFile(string filename, bool readIntoMemory);
-		void WriteFile(IntPtr fileHandle, long offset, long size);
-		void WriteFile(string filename, long offset, long size);
-		void WriteSubstitution(HttpResponseSubstitutionCallback callback);
+		IHttpConnection Connection { get; }
 
-		bool Buffer { get; set; }
-		bool BufferOutput { get; set; }
-		HttpCachePolicy Cache { get; }
-		string CacheControl { get; set; }
-		string Charset { get; set; }
-		Encoding ContentEncoding { get; set; }
-		string ContentType { get; set; }
-		HttpCookieCollection Cookies { get; }
-		int Expires { get; set; }
-		DateTime ExpiresAbsolute { get; set; }
-		Stream Filter { get; set; }
-		Encoding HeaderEncoding { get; set; }
-		NameValueCollection Headers { get; }
-		bool IsClientConnected { get; }
-		bool IsRequestBeingRedirected { get; }
-		TextWriter Output { get; }
-		Stream OutputStream { get; }
-		string RedirectLocation { get; set; }
-		string Status { get; set; }
-		int StatusCode { get; set; }
-		string StatusDescription { get; set; }
-		int SubStatusCode { get; set; }
-		bool SuppressContent { get; set; }
-		bool TrySkipIisCustomErrors { get; set; }
+		void WriteStatus(int code, string description);
+
+		void WriteHeader(string name, string value);
+
+		void WriteBody(byte[] buffer, int offset, int length);
 	}
 }
