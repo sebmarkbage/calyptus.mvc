@@ -82,6 +82,13 @@ namespace Calyptus.Mvc
 			}
 			if (TrailingSlash && _path.Length > 0) sb.Append('/');
 
+			sb.Append(GetQueryString());
+			return sb.ToString();
+		}
+
+		public string GetQueryString()
+		{
+			StringBuilder sb = new StringBuilder();
 			if (QueryString.Count > 0)
 			{
 				bool first = true;
@@ -89,7 +96,7 @@ namespace Calyptus.Mvc
 				{
 					string key = QueryString.Keys[i];
 					key = string.IsNullOrEmpty(key) ? null : HttpUtility.UrlEncodeUnicode(key) + "=";
-					
+
 					foreach (string value in QueryString.GetValues(i))
 						if (value != null)
 						{

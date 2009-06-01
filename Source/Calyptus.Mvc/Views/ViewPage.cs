@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Text;
 
 namespace Calyptus.Mvc
 {
@@ -98,9 +99,14 @@ namespace Calyptus.Mvc
 			_template = template;
 		}
 
-		public void Render(Stream stream)
+		public void Render(Stream stream, IRouteContext routeContext)
 		{
-			throw new NotImplementedException();
+			this.Route = routeContext;
+			using (var writer = new StreamWriter(stream, Encoding.UTF8))
+			{
+				var context = new HttpContext(new HttpRequest("", "", null), new HttpResponse(writer));
+				((IHttpHandler)this).ProcessRequest(context);
+			}
 		}
 
 		public void Render(IHttpContext context)

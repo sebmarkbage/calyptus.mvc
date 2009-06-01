@@ -119,6 +119,7 @@ namespace Calyptus.Mvc
 					overloadWeight += path.Index;
 					overloadWeight *= 110;
 				}
+				if (Extension != null) overloadWeight += Extension.Length;
 				return true;
 			}
 			value = null;

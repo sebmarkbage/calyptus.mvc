@@ -24,6 +24,10 @@ namespace Calyptus.Mvc
 
 		public IRoutingEngine RoutingEngine { get; private set; }
 
+		public RouteContext(IRoutingEngine engine, string appUrl) : this(engine, appUrl, 0, false)
+		{
+		}
+
 		public RouteContext(IRoutingEngine engine, string appPath, int pathCount, bool trailingSlash)
 		{
 			_pathCount = pathCount;
@@ -34,6 +38,8 @@ namespace Calyptus.Mvc
 			if (!_appPath.EndsWith("/")) _appPath += "/";
 			_disposableControllers = new Stack<IDisposable>();
 		}
+
+		
 
 		public void AddController(object controller, int pathIndex)
 		{
@@ -186,7 +192,7 @@ namespace Calyptus.Mvc
 				RoutingEngine.SerializeRelativePath(route, path);
 
 			if (path.Count == 0 && p.Length == 0)
-				p.Append("./");
+				p.Append("./" + path.GetQueryString());
 			else
 				p.Append(path.GetPath(pathIndex == 0));
 

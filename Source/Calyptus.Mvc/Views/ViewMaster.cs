@@ -85,7 +85,7 @@ namespace Calyptus.Mvc
 			get { return ((IView)Page).ContentType; }
 		}
 
-		void IView.Render(System.IO.Stream stream)
+		void IView.Render(System.IO.Stream stream, IRouteContext routeContext)
 		{
 			throw new NotImplementedException();
 		}

@@ -12,7 +12,7 @@ namespace Calyptus.Mvc
 {
     public class WebFormsViewFactory : IViewFactory
     {
-		public IView FindView(IHttpContext context, IViewTemplate template)
+		public IView FindView(IViewTemplate template)
 		{
 			IView view = GetPageInstance(template);
 			if (view == null) return null;

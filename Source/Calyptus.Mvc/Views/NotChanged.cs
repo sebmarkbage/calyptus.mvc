@@ -2,26 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Calyptus.Mvc
 {
-	public class NotChanged : Exception, IView
+	public class NotChanged : Exception, IRenderable
 	{
 		void IRenderable.Render(IHttpContext context)
 		{
 			IHttpResponse response = context.Response;
 			response.Clear();
+			response.Cache.SetCacheability(HttpCacheability.NoCache);
 			response.StatusCode = 304;
-		}
-
-		string IView.ContentType
-		{
-			get { return null; }
-		}
-
-		void IView.Render(System.IO.Stream stream)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

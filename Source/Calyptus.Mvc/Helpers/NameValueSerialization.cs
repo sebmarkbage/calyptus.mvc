@@ -27,6 +27,15 @@ namespace Calyptus.Mvc
 					if (s.Length != 2) { value = null; return false; }
 					value = new Size(int.Parse(s[0]), int.Parse(s[1]));
 				}
+				else if (type == typeof(Guid))
+				{
+					if (singleValue.Length != 36 || singleValue[8] != '-' || singleValue[13] != '-' || singleValue[18] != '-' || singleValue[23] != '-')
+					{
+						value = null;
+						return false;
+					}
+					value = new Guid(singleValue);
+				}
 				else
 				{
 					value = Convert.ChangeType(singleValue, type, System.Globalization.CultureInfo.InvariantCulture);
@@ -56,6 +65,7 @@ namespace Calyptus.Mvc
 
 		public static bool TryDeserialize(NameValueCollection collection, string key, Type type, out object value)
 		{
+			if (collection[key] == null) { value = null; return false; }
 			return TryDeserialize(collection[key], type, out value);
 		}
 

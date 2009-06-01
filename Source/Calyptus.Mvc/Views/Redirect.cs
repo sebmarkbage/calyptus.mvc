@@ -21,7 +21,7 @@ namespace Calyptus.Mvc
 		}
 	}
 
-	public class Redirect : RedirectBase, IView
+	public class Redirect : RedirectBase, IRenderable
 	{
 		private bool isUrl;
 		private string url;
@@ -62,19 +62,9 @@ namespace Calyptus.Mvc
 			else
 				base.Render(context, context.Route.GetAbsolutePath(Action));
 		}
-
-		string IView.ContentType
-		{
-			get { return "text/html"; }
-		}
-
-		void IView.Render(System.IO.Stream stream)
-		{
-			throw new NotImplementedException("Can't render a redirect to a stream.");
-		}
 	}
 
-	public class Redirect<TRelativeController> : RedirectBase, IView
+	public class Redirect<TRelativeController> : RedirectBase, IRenderable
 	{
 		public int Index { get; private set; }
 		public Expression<Action<TRelativeController>> Action { get; private set; }
@@ -97,19 +87,9 @@ namespace Calyptus.Mvc
 		{
 			base.Render(context, context.Route.GetRelativePath<TRelativeController>(Index, Action));
 		}
-
-		string IView.ContentType
-		{
-			get { return "text/html"; }
-		}
-
-		void IView.Render(System.IO.Stream stream)
-		{
-			throw new NotImplementedException("Can't render a redirect to a stream.");
-		}
 	}
 
-	public class Redirect<TRelativeController, TWithActionsFromController> : RedirectBase, IView
+	public class Redirect<TRelativeController, TWithActionsFromController> : RedirectBase, IRenderable
 	{
 		public int Index { get; private set; }
 		public int SecondIndex { get; private set; }
@@ -138,16 +118,6 @@ namespace Calyptus.Mvc
 		void IRenderable.Render(IHttpContext context)
 		{
 			base.Render(context, context.Route.GetRelativePath<TRelativeController, TWithActionsFromController>(Index, SecondIndex, Action));
-		}
-
-		string IView.ContentType
-		{
-			get { return "text/html"; }
-		}
-
-		void IView.Render(System.IO.Stream stream)
-		{
-			throw new NotImplementedException("Can't render a redirect to a stream.");
 		}
 	}
 }

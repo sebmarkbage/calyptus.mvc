@@ -6,7 +6,7 @@ namespace Calyptus.Mvc
 	public interface IView : IViewTemplate, IRenderable
 	{
 		string ContentType { get; }
-		void Render(Stream stream);
+		void Render(Stream stream, IRouteContext routeContext);
 	}
 
 	public interface IView<TTemplate> : IView where TTemplate : class, IViewTemplate

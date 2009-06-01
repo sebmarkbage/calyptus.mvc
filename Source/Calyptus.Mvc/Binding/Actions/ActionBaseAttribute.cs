@@ -144,7 +144,7 @@ namespace Calyptus.Mvc
 
 			if (Bindings == null)
 			{
-				parameters = null;
+				parameters = new object[0];
 				return true;
 			}
 
@@ -274,11 +274,11 @@ namespace Calyptus.Mvc
 			IViewTemplate template = value as IViewTemplate;
 			if (template != null)
 			{
-				IView view = context.ViewFactory != null ? context.ViewFactory.FindView(context, template) : null;
+				IView view = context.ViewFactory != null ? context.ViewFactory.FindView(template) : null;
 				if (view != null)
 					value = view;
 				else if (!(template is IRenderable))
-					value = MockViewFactory.CreateView(context, template);
+					value = MockViewFactory.CreateView(template);
 			}
 
 			IRenderable renderable = value as IRenderable;

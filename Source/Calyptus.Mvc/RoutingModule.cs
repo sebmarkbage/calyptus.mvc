@@ -71,7 +71,16 @@ namespace Calyptus.Mvc
 			IViewFactory viewFactory = Config.GetViewFactory();
 			IRouteContext route = new RouteContext(routing, request.ApplicationPath, stack.Count, stack.TrailingSlash);
 
-			IHttpHandler handler = routing.ParseRoute(new HttpContextWrapper(context, route, viewFactory), stack);
+			IHttpHandler handler;
+			try
+			{
+				handler = routing.ParseRoute(new HttpContextWrapper(context, route, viewFactory), stack);
+			}
+			catch
+			{
+				route.Dispose();
+				throw;
+			}
 			if (handler != null)
 			{
 				context.Items[_requestDataKey] = new RequestData { Handler = handler, OriginalPath = context.Request.Path, Route = route };

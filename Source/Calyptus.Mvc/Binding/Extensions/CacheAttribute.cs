@@ -16,6 +16,9 @@ namespace Calyptus.Mvc
 		private int _duration;
 		public int Duration { get { return _duration; } set { _durationSet = true; _duration = value; } }
 
+		public string VaryByParams { get; set; }
+		public string VaryByHeaders { get; set; }
+
 		public CacheAttribute()
 		{
 			Cacheability = HttpCacheability.Public;
@@ -26,9 +29,38 @@ namespace Calyptus.Mvc
 
 		public void OnBeforeAction(IHttpContext context, BeforeActionEventArgs args)
 		{
-			context.Response.Cache.SetCacheability(Cacheability);
+			var cache = context.Response.Cache;
+			if (VaryByParams != null)
+			{
+				if (VaryByParams.Trim().Equals("none", StringComparison.OrdinalIgnoreCase))
+					cache.VaryByParams.IgnoreParams = true;
+				else
+				{
+					cache.VaryByParams["*"] = false;
+					foreach (var param in VaryByParams.Split(','))
+						cache.VaryByParams[param.Trim()] = true;
+				}
+			}
+
+			if (VaryByHeaders != null)
+			{
+				cache.SetOmitVaryStar(true);
+				cache.VaryByHeaders["*"] = false;
+				foreach (var param in VaryByHeaders.Split(','))
+				{
+					var p = param.Trim();
+					if (p == "*") cache.SetOmitVaryStar(false);
+					cache.VaryByHeaders[p] = true;
+				}
+			}
+
+			//context.Response.Cache.VaryByParams 
+			//context.Response.Cache.SetCacheability(Cacheability);
 			if (_durationSet)
-				context.Response.Cache.SetExpires(DateTime.Now.AddSeconds((double)_duration));
+			{
+				cache.SetExpires(DateTime.Now.AddSeconds((double)_duration));
+				cache.SetMaxAge(new TimeSpan(0, 0, _duration));
+			}
 		}
 
 		public void OnError(IHttpContext context, ErrorEventArgs args) { }

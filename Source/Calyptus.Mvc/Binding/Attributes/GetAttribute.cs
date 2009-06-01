@@ -60,13 +60,12 @@ namespace Calyptus.Mvc
 
 		protected override bool TryBinding(IHttpContext context, out object value)
 		{
-			if (SerializationHelper.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value))
-				return Optional ? true : value != null;
-			return false;
+			return SerializationHelper.TryDeserialize(context.Request.QueryString, Key, BindingTargetType, out value);
 		}
 
 		protected override void SerializePath(IPathStack path, object value)
 		{
+			if (value == null && !Optional) throw new BindingException("Cannot serialize null value. Value is not Optional.");
 			SerializationHelper.Serialize(value, path.QueryString, Key);
 		}
 	}

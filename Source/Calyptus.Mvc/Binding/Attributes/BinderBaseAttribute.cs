@@ -100,7 +100,8 @@ namespace Calyptus.Mvc
 
 			if (!r)
 			{
-				value = (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType) : null));
+				//value = (DefaultValue != null ? DefaultValue : (BindingTargetType.IsValueType ? Activator.CreateInstance(BindingTargetType, true) : null));
+				value = DefaultValue ?? null;
 				return Optional;
 			}
 			return true;

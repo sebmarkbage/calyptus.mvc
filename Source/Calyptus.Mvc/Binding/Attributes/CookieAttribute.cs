@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Web;
+using System.Collections.Specialized;
 
 namespace Calyptus.Mvc
 {
@@ -64,18 +65,20 @@ namespace Calyptus.Mvc
 				obj = cookie;
 				return true;
 			}
-			else if (Compress)
+			return TryBinding(cookie.Value, out obj);
+		}
+
+		protected virtual bool TryBinding(string value, out object obj)
+		{
+			if (Compress || _complexType)
 			{
 				System.Web.UI.LosFormatter formatter = new System.Web.UI.LosFormatter();
-				obj = formatter.Deserialize(cookie.Value);
+				obj = formatter.Deserialize(value);
 				return obj != null && obj.GetType().IsAssignableFrom(this._type);
 			}
 			else
 			{
-				if (!_complexType)
-					return SerializationHelper.TryDeserialize(cookie.Value, _type, out obj);
-				else
-					return SerializationHelper.TryDeserialize(cookie.Values, null, _type, out obj);
+				return SerializationHelper.TryDeserialize(value, _type, out obj);
 			}
 		}
 
@@ -105,21 +108,8 @@ namespace Calyptus.Mvc
 					cookie.Domain = null;
 				if (ExpiresInSeconds != 0)
 					cookie.Expires = ExpiresInSeconds == Double.MaxValue ? DateTime.MaxValue : DateTime.Now.AddSeconds(ExpiresInSeconds);
-
-				if (Compress)
-				{
-					System.Web.UI.LosFormatter formatter = new System.Web.UI.LosFormatter();
-					System.IO.StringWriter writer = new System.IO.StringWriter();
-					formatter.Serialize(writer, value);
-					cookie.Value = writer.ToString();
-				}
-				else
-				{
-					if (!_complexType)
-						cookie.Value = SerializationHelper.Serialize(value);
-					else
-						SerializationHelper.Serialize(value, cookie.Values, null);
-				}
+				
+				cookie.Value = SerializeBinding(value);
 			}
 			if (cookie == null)
 				context.Response.Cookies.Remove(_name);
@@ -128,6 +118,21 @@ namespace Calyptus.Mvc
 				HttpCookie requestCookie = context.Request.Cookies[_name];
 				if (requestCookie == null || requestCookie.Value != cookie.Value) // Only set if value has changed
 					context.Response.Cookies.Add(cookie);
+			}
+		}
+
+		protected virtual string SerializeBinding(object value)
+		{
+			if (Compress || _complexType)
+			{
+				System.Web.UI.LosFormatter formatter = new System.Web.UI.LosFormatter();
+				System.IO.StringWriter writer = new System.IO.StringWriter();
+				formatter.Serialize(writer, value);
+				return writer.ToString();
+			}
+			else
+			{
+				return SerializationHelper.Serialize(value);
 			}
 		}
 

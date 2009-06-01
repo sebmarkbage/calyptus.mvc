@@ -7,12 +7,12 @@ namespace Calyptus.Mvc
 {
 	public class MockViewFactory : IViewFactory
 	{
-		public IView FindView(IHttpContext context, IViewTemplate view)
+		public IView FindView(IViewTemplate view)
 		{
 			return new MockView(view);
 		}
 
-		public static IView CreateView(IHttpContext context, IViewTemplate view)
+		public static IView CreateView(IViewTemplate view)
 		{
 			return new MockView(view);
 		}
@@ -41,7 +41,7 @@ namespace Calyptus.Mvc
 				get { return "text/html"; }
 			}
 
-			public void Render(System.IO.Stream stream)
+			public void Render(System.IO.Stream stream, IRouteContext routeContext)
 			{
 				throw new NotImplementedException();
 			}

@@ -216,7 +216,13 @@ namespace Calyptus.Mvc
 					handler.Binding.SerializePath(trialStack, action.Parameters);
 
 					if (action.ChildAction != null)
-						if (!(handler is ParentActionHandler)) throw new BindingException("Method \"{0}\" is not a parent action and can't handle further calls.");
+					{
+						if (!(handler is ParentActionHandler)) throw new BindingException("Method is not a parent action and can't handle further calls.");
+					}
+					else
+					{
+						if (handler is ParentActionHandler) throw new BindingException("Method is a parent action. You should add the default sub-action.");
+					}
 
 					if (trialStack.Index == 0) trialStack.TrailingSlash = !DisableTrailingSlash;
 

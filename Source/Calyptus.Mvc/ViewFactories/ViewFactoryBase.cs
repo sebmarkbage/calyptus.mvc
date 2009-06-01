@@ -7,7 +7,7 @@ namespace Calyptus.Mvc
 {
 	public abstract class ViewFactoryBase : IViewFactory
 	{
-		public abstract IView FindView(IHttpContext context, IViewTemplate view);
+		public abstract IView FindView(IViewTemplate view);
 
 		protected IView GetInstance(Type templateType)
 		{
