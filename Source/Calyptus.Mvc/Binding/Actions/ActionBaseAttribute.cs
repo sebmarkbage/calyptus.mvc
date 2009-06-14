@@ -9,9 +9,10 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
+//using System.Runtime.Serialization.Json;
 using System.Xml.Linq;
 using System.Xml;
+using System.Web.Script.Serialization;
 
 namespace Calyptus.Mvc
 {
@@ -296,7 +297,22 @@ namespace Calyptus.Mvc
 			}
 
 			string requestType = context.Request.ContentType;
+			
 			if (IsJson(ResponseType) || (ResponseType == null && (IsJson(requestType) || "JSON".Equals(context.Request.Headers["X-Request"], StringComparison.InvariantCultureIgnoreCase) || AcceptJsonBeforeXml(context.Request.AcceptTypes))))
+			{
+				if (ResponseType == null) context.Response.ContentType = "application/json";
+				if (value == null) context.Response.Write("null");
+				else
+				{
+					context.Response.Charset = context.Response.ContentEncoding.WebName;
+					StringBuilder sb = new StringBuilder();
+					JavaScriptSerializer serializer = new JavaScriptSerializer();
+					serializer.Serialize(value, sb);
+					context.Response.Write(sb.ToString());
+				}
+			}
+
+			/*if (IsJson(ResponseType) || (ResponseType == null && (IsJson(requestType) || "JSON".Equals(context.Request.Headers["X-Request"], StringComparison.InvariantCultureIgnoreCase) || AcceptJsonBeforeXml(context.Request.AcceptTypes))))
 			{
 				if (ResponseType == null) context.Response.ContentType = "application/json";
 				if (value == null && _returnType == null) context.Response.Write("null");
@@ -331,7 +347,7 @@ namespace Calyptus.Mvc
 							}
 						}
 					}
-			}
+			}*/
 		}
 
 		private bool AcceptJsonBeforeXml(string[] acceptTypes)

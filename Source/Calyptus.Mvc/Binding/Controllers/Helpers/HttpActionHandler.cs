@@ -23,6 +23,7 @@ namespace Calyptus.Mvc
 
 		public void ProcessRequest(HttpContext context)
 		{
+			//if (Context is HttpContextWrapper) (Context as HttpContextWrapper).WrappedContext = context;
 			object value = Handler.ExecuteAction(Context, Controller, Arguments);
 			Handler.RenderAction(Context, value);
 		}
@@ -99,6 +100,7 @@ namespace Calyptus.Mvc
 
 		public IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback callback, object state)
 		{
+			//if (Context is HttpContextWrapper) (Context as HttpContextWrapper).WrappedContext = context;
 			Arguments[Arguments.Length - 2] = callback;
 			Arguments[Arguments.Length - 1] = state;
 

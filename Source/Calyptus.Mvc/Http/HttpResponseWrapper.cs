@@ -14,6 +14,18 @@ namespace Calyptus.Mvc
 	{
 		private HttpResponse _httpResponse;
 
+		internal HttpResponse Wrapped
+		{
+			get
+			{
+				return _httpResponse;
+			}
+			set
+			{
+				_httpResponse = value;
+			}
+		}
+
 		public HttpResponseWrapper(HttpResponse httpResponse)
 		{
 			this._httpResponse = httpResponse;

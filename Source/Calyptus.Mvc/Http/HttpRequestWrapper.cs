@@ -14,6 +14,18 @@ namespace Calyptus.Mvc
 		// Fields
 		private HttpRequest _httpRequest;
 
+		internal HttpRequest Wrapped
+		{
+			get
+			{
+				return _httpRequest;
+			}
+			set
+			{
+				_httpRequest = value;
+			}
+		}
+
 		// Methods
 		public HttpRequestWrapper(HttpRequest httpRequest)
 		{

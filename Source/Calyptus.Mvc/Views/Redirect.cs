@@ -14,7 +14,7 @@ namespace Calyptus.Mvc
 		protected void Render(IHttpContext context, string url)
 		{
 			IHttpResponse response = context.Response;
-			response.Clear();
+			//response.Clear();
 			response.RedirectLocation = url;
 			response.StatusCode = Permanent ? 301 : 302;
 			response.Write("<html><head><title>The object has moved</title></head><body><h2><a href=\"" + HttpUtility.HtmlAttributeEncode(url) + "\">Click here</a></h2></body></html>");

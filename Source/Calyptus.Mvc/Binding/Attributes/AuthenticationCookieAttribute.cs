@@ -22,7 +22,7 @@ namespace Calyptus.Mvc
 		protected override bool TryBinding(string value, out object obj)
 		{
 			var ticket = FormsAuthentication.Decrypt(value);
-			if (ticket.Expired)
+			if (ticket == null || ticket.Expired)
 			{
 				obj = null;
 				return false;

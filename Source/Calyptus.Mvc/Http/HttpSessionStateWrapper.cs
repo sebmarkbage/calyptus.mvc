@@ -10,6 +10,18 @@ namespace Calyptus.Mvc
 	{
 		private HttpSessionState _session;
 
+		internal HttpSessionState Wrapped
+		{
+			get
+			{
+				return _session;
+			}
+			set
+			{
+				_session = value;
+			}
+		}
+
 		public HttpSessionStateWrapper(HttpSessionState session)
 		{
 			this._session = session;

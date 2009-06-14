@@ -105,14 +105,24 @@ namespace Calyptus.Mvc
 				cookie.HttpOnly = HttpOnly;
 				cookie.Secure = Secure;
 				if (Domain != null)
-					cookie.Domain = null;
+					cookie.Domain = Domain;
 				if (ExpiresInSeconds != 0)
 					cookie.Expires = ExpiresInSeconds == Double.MaxValue ? DateTime.MaxValue : DateTime.Now.AddSeconds(ExpiresInSeconds);
 				
 				cookie.Value = SerializeBinding(value);
 			}
+
 			if (cookie == null)
-				context.Response.Cookies.Remove(_name);
+			{
+				HttpCookie requestCookie = context.Request.Cookies[_name];
+				if (requestCookie != null && requestCookie.Value != null) // Only set if value has changed
+					context.Response.Cookies.Add(new HttpCookie(_name)
+					{
+						HttpOnly = HttpOnly,
+						Expires = DateTime.Now.AddDays(-1),
+						Secure = Secure
+					});
+			}
 			else
 			{
 				HttpCookie requestCookie = context.Request.Cookies[_name];

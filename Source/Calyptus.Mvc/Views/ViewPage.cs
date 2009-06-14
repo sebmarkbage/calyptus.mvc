@@ -102,6 +102,11 @@ namespace Calyptus.Mvc
 		public void Render(Stream stream, IRouteContext routeContext)
 		{
 			this.Route = routeContext;
+			Render(stream);
+		}
+
+		public void Render(Stream stream)
+		{
 			using (var writer = new StreamWriter(stream, Encoding.UTF8))
 			{
 				var context = new HttpContext(new HttpRequest("", "", null), new HttpResponse(writer));
@@ -112,7 +117,11 @@ namespace Calyptus.Mvc
 		public void Render(IHttpContext context)
 		{
 			this.Route = context.Route;
-			((IHttpHandler)this).ProcessRequest(context.ApplicationInstance.Context);
+			HttpContextWrapper c = context as HttpContextWrapper;
+			if (c != null)
+				((IHttpHandler)this).ProcessRequest(c.WrappedContext);
+			else
+				Render(context.Response.OutputStream);
 		}
 	}
 

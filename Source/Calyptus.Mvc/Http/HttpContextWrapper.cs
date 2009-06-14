@@ -15,6 +15,21 @@ namespace Calyptus.Mvc
 		private IHttpResponse _response;
 		private IHttpSessionState _session;
 
+		internal HttpContext WrappedContext
+		{
+			get
+			{
+				return _context;
+			}
+			set
+			{
+				_context = value;
+				(_response as HttpResponseWrapper).Wrapped = value.Response;
+				(_request as HttpRequestWrapper).Wrapped = value.Request;
+				(_session as HttpSessionStateWrapper).Wrapped = value.Session;
+			}
+		}
+
 		public HttpContextWrapper(HttpContext context, IRouteContext route, IViewFactory viewFactory)
 		{
 			this._context = context;
